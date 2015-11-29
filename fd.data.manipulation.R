@@ -79,7 +79,7 @@ fan.full$Date <- as.Date(fan.full$Date, "%m/%d/%Y")
 
 ## quick cliean
 full.data <- fan.full %>%
-  select(week = Week, name = Name, position = Position, team = Team, home.away = Home.Away, opponent = Opponent, fanduel.pts = FanDuel.pts, fanduel.sal = FanDuel.sal, date = Date, location = Location)
+  select(week = Week, name = Name, position = Position, team = Team, home.away = Home.Away, opponent = Opponent, fanduel.pts = FanDuel.pts, fanduel.sal = FanDuel.sal, date = Date, location = Location, cmp:pts_allowed)
 
 ## output full data here
 write.csv(full.data, "/Users/brett/GitHub/proj-fantasy/fully_merged.csv")
