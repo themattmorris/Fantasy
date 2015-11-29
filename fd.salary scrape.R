@@ -26,5 +26,5 @@ for (i in 1:11) {
       html_text()
   })
   ## save raw data for archival
-  write(d, file = "/Users/brett/GitHub/proj-fantasy/Salary.csv", sep = ";")
+  write(d, file = "/Users/brett/GitHub/proj-fantasy/salary.csv", sep = ";")
 }
