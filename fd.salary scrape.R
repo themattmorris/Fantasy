@@ -1,7 +1,8 @@
 packages <- c('rvest', 'knitr', 'pipeR', 'MASS')
 lapply(packages, library, character.only = T)
 
-fd.sites <- c("http://rotoguru1.com/cgi-bin/fyday.pl?week=11&game=fd&scsv=1",
+fd.sites <- c("http://rotoguru1.com/cgi-bin/fyday.pl?week=12&game=fd&scsv=1",
+            "http://rotoguru1.com/cgi-bin/fyday.pl?week=11&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=10&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=9&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=8&game=fd&scsv=1",
@@ -13,9 +14,9 @@ fd.sites <- c("http://rotoguru1.com/cgi-bin/fyday.pl?week=11&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=2&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=1&game=fd&scsv=1")
 
-d <- matrix(nrow = 11, ncol = 1)
+d <- matrix(nrow = 12, ncol = 1)
 
-for (i in 1:11) {
+for (i in 1:12) {
   ## loop through pages above
   roto <- fd.sites[i]
   urls <- read_html(roto)
@@ -26,5 +27,5 @@ for (i in 1:11) {
       html_text()
   })
   ## save raw data for archival
-  write(d, file = "/Users/brett/GitHub/proj-fantasy/salary.csv", sep = ";")
+  write(d, file = "/Users/bsteele/GitHub/proj-fantasy/salary.csv", sep = ";")
 }
