@@ -19,10 +19,10 @@ years = list()
 years = (2012, 2013, 2014, 2015)
 
 stats = list()
-stats = ('passing', 'rushing', 'receiving', 'returning', 'defense', 'givetake')
-stats2 = ('Passing', 'Rushing', 'Receiving', 'Returning', 'Defense', 'Give/Take')
+stats = ('passing', 'rushing', 'receiving', 'returning')
+stats2 = ('Passing', 'Rushing', 'Receiving', 'Returning')
 statsDict = dict()
-statsDict = {'passing':'Passing', 'rushing':'Rushing', 'receiving':'Receiving', 'returning':'Returning', 'defense':'Miscellaneous', 'givetake':'Give/Take', 'NA':'Total'}
+statsDict = {'passing':'Passing', 'rushing':'Rushing', 'receiving':'Receiving', 'returning':'Returning', 'NA':'Total'}
 
 teams = dict()
 teams = {'Baltimore':'BAL','Cincinnati':'CIN','Cleveland':'CLE','Pittsburgh':'PIT','Houston':'HOU','Indianapolis':'IND','Jacksonville':'JAX','Tennessee':'TEN','Buffalo':'BUF','Miami':'MIA','New England':'NWE','NY Jets':'NYJ','Denver':'DEN','Kansas City':'KAN','Oakland':'OAK','San Diego':'SDG','Chicago':'CHI','Detroit':'DET','Green Bay':'GNB','Minnesota':'MIN','Atlanta':'ATL','Carolina':'CAR','New Orleans':'NOR','Tampa Bay':'TAM','Dallas':'DAL','NY Giants':'NYG','Philadelphia':'PHI','Washington':'WAS','Arizona':'ARI','San Francisco':'SFO','Seattle':'SEA','St. Louis':'STL'}
@@ -45,7 +45,7 @@ def ReformatDataFrame(year, dataframe, flag, merge, stat):
             result = pd.DataFrame
         else:
             with open('C:/Users/Matt/Desktop/Defense_Data.csv', 'a') as f:
-                result[::][1:].to_csv(f, index = False, header = False)
+                result.to_csv(f, index = False, header = False)
 
     # Append season to data
     x = np.repeat(year, 32, axis = 0)
@@ -82,10 +82,7 @@ def FindStat(url):
     global stats
 
     for stat in stats:
-        if (stat <> 'defense') and (url.find(stat) > -1):
-            y = stat
-            break
-        elif (stat == 'defense') and (url.find(stat) < 60):
+        if url.find(stat) > -1:
             y = stat
             break
         else:
@@ -133,7 +130,7 @@ for url in tags:
     
     # Change team field to be abbreviation to be used for joining to other tables
     # Start position is the row starting number.  Some tables have multiple header rows.
-    if (url.find('givetake') > -1) or (url.find('returning') > -1) or (url.find('defense') < 60):
+    if url.find('returning') > -1:
         df[0] = df[0].ix[1:]
         df[0] = df[0].reset_index(drop = True)
     
@@ -172,4 +169,4 @@ for url in tags:
         
 # Print last result to csv
 with open('C:/Users/Matt/Desktop/Defense_Data.csv', 'a') as f:
-    result[::][1:].to_csv(f, index = False, header = False)
+    result.to_csv(f, index = False, header = False)
