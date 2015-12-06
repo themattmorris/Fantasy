@@ -5,7 +5,7 @@ lapply(data.packages, library, character.only = T)
 select <- dplyr::select
 
 ## import raw data as a table
-Salary <- tbl_df(read.csv("/Users/brett/GitHub/proj-fantasy/salary.csv", header = TRUE, ";", skipNul = FALSE, stringsAsFactors = FALSE))
+Salary <- tbl_df(read.csv("/Users/brett/GitHub/proj-fantasy/data/salary.csv", header = TRUE, ";", skipNul = FALSE, stringsAsFactors = FALSE))
 
 #### clean up
 ## remove gid column and filter out def for name format reshape remove salaries that are 0 as these players weren't available
@@ -31,7 +31,7 @@ clean <- rbind(reorg, def)
 library(devtools, quietly=TRUE)
 source_gist("https://gist.github.com/dfalster/5589956")
 allowedVars <- c("Name", "Position", "Home.Away")
-clean.lu <- addNewData("/Users/brett/GitHub/proj-fantasy/lookup_table.csv", clean, allowedVars)
+clean.lu <- addNewData("/Users/brett/GitHub/proj-fantasy/data/lookup_table.csv", clean, allowedVars)
 
 ## format columns to match profootball reference export
 clean.lu$Season <- as.integer(clean.lu$Season)
@@ -44,10 +44,10 @@ clean.lu$FanDuel.pts <- as.double(clean.lu$FanDuel.pts)
 clean.lu$FanDuel.sal <- as.double(clean.lu$FanDuel.sal)
 
 ## save cleaned fanduel output
-write.csv(clean.lu, "/Users/brett/GitHub/proj-fantasy/fanduel_2015_season_summary.csv")
+write.csv(clean.lu, "/Users/brett/GitHub/proj-fantasy/data/fanduel_2015_season_summary.csv")
 
 ## import profootref data
-PFR <- tbl_df(read.csv("/Users/brett/GitHub/proj-fantasy/fantasy_data.csv", header = TRUE, skipNul = FALSE, stringsAsFactors = FALSE))
+PFR <- tbl_df(read.csv("/Users/brett/GitHub/proj-fantasy/data/fantasy_data.csv", header = TRUE, skipNul = FALSE, stringsAsFactors = FALSE))
 
 ## have to add home.away for a min because i'm lazy and want to reuse lookup table
 Home.Away <- c(" ")
@@ -61,7 +61,7 @@ pfr.data <- pfr.data %>%
 ## lookup tables for fb's and kr's
 source_gist("https://gist.github.com/dfalster/5589956")
 allowedVars <- c("Name", "Position", "Home.Away")
-pfr.lu <- addNewData("/Users/brett/GitHub/proj-fantasy/lookup_table.csv", pfr.data, allowedVars)
+pfr.lu <- addNewData("/Users/brett/GitHub/proj-fantasy/data/lookup_table.csv", pfr.data, allowedVars)
 
 ## drop Home.Away column
 pfr.clean <- pfr.lu %>%
@@ -82,4 +82,4 @@ full.data <- fan.full %>%
   select(week = Week, name = Name, position = Position, team = Team, home.away = Home.Away, opponent = Opponent, fanduel.pts = FanDuel.pts, fanduel.sal = FanDuel.sal, date = Date, location = Location, cmp:pts_allowed)
 
 ## output full data here
-write.csv(full.data, "/Users/brett/GitHub/proj-fantasy/fully_merged.csv")
+write.csv(full.data, "/Users/brett/GitHub/proj-fantasy/final_dataset.csv")
