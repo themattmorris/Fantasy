@@ -71,7 +71,7 @@ pfr.clean <- pfr.lu %>%
 fan.full <- full_join(clean.lu, pfr.clean, by = c("Name", "Week", "Season"))
 
 ## convert columns of full
-fan.full$Week <- factor(fan.full$Week, levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"))
+fan.full$Week <- factor(fan.full$Week, levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"))
 fan.full$Location <- as.factor(fan.full$Location)
 fan.full$off_snap_count_pct <- as.numeric(substr(fan.full$off_snap_count_pct,0,nchar(fan.full$off_snap_count_pct)-1))
 fan.full$def_snap_count_pct <- as.numeric(substr(fan.full$def_snap_count_pct,0,nchar(fan.full$def_snap_count_pct)-1))
