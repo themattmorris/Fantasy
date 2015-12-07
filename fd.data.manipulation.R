@@ -143,4 +143,4 @@ opti.plyrs %>%
   summarise(count = n())
 
 #### output full data here ####
-write.csv(full.data, "/Users/brett/GitHub/proj-fantasy/data/optimal_player_list.csv")
+write.csv(opti.plyrs, "/Users/brett/GitHub/proj-fantasy/data/optimal_player_list.csv")
