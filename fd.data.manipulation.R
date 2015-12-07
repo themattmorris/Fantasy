@@ -1,19 +1,19 @@
-data.packages <- c('dplyr', 'ggplot2', 'RColorBrewer', 'ggthemes', 'scales', 'tidyr', 'MASS', 'devtools', 'lubridate')
+data.packages <- c('dplyr', 'ggplot2', 'RColorBrewer', 'ggthemes', 'scales', 'tidyr', 'MASS', 'devtools', 'lubridate', 'mosaic')
 lapply(data.packages, library, character.only = T)
 
 ## redefine select from dplyr because MASS package causes issues
 select <- dplyr::select
 
 ## import raw data as a table
-Salary <- tbl_df(read.csv("/Users/brett/GitHub/proj-fantasy/data/salary.csv", header = TRUE, ";", skipNul = FALSE, stringsAsFactors = FALSE))
+salary <- tbl_df(read.csv("/Users/brett/GitHub/proj-fantasy/data/salary.csv", header = TRUE, ";", skipNul = FALSE, stringsAsFactors = FALSE))
 
 #### clean up
 ## remove gid column and filter out def for name format reshape remove salaries that are 0 as these players weren't available
-no.def <- Salary %>%
+no.def <- salary %>%
   select(Season = Year, Week, Name, Position = Pos, Team, Home.Away = h.a, Opponent = Oppt, FanDuel.pts = FD.points, FanDuel.sal = FD.salary) %>% 
   filter(Position %in% c("QB", "RB", "WR", "TE", "PK"), FanDuel.sal >= 1)
 
-def <- Salary %>%
+def <- salary %>%
   select(Season = Year, Week, Name, Position = Pos, Team, Home.Away = h.a, Opponent = Oppt, FanDuel.pts = FD.points, FanDuel.sal = FD.salary) %>% 
   filter(Position == "Def", FanDuel.sal >= 1)
 
@@ -47,11 +47,11 @@ clean.lu$FanDuel.sal <- as.double(clean.lu$FanDuel.sal)
 write.csv(clean.lu, "/Users/brett/GitHub/proj-fantasy/data/fanduel_2015_season_summary.csv")
 
 ## import profootref data
-PFR <- tbl_df(read.csv("/Users/brett/GitHub/proj-fantasy/data/fantasy_data.csv", header = TRUE, skipNul = FALSE, stringsAsFactors = FALSE))
+pro.foot.ref <- tbl_df(read.csv("/Users/brett/GitHub/proj-fantasy/data/fantasy_data_20151202.csv", header = TRUE, skipNul = FALSE, stringsAsFactors = FALSE))
 
-## have to add home.away for a min because i'm lazy and want to reuse lookup table
+## have to add home.away and reuse lookup table
 Home.Away <- c(" ")
-pfr.data <- cbind(PFR, Home.Away)
+pfr.data <- cbind(pro.foot.ref, Home.Away)
 
 pfr.data <- pfr.data %>%
   mutate(Home.Away = "") %>%
@@ -75,11 +75,39 @@ fan.full$Week <- factor(fan.full$Week, levels = c("1", "2", "3", "4", "5", "6", 
 fan.full$Location <- as.factor(fan.full$Location)
 fan.full$off_snap_count_pct <- as.numeric(substr(fan.full$off_snap_count_pct,0,nchar(fan.full$off_snap_count_pct)-1))
 fan.full$def_snap_count_pct <- as.numeric(substr(fan.full$def_snap_count_pct,0,nchar(fan.full$def_snap_count_pct)-1))
+fan.full$st_snap_count_pct <- as.numeric(substr(fan.full$st_snap_count_pct,0,nchar(fan.full$st_snap_count_pct)-1))
 fan.full$Date <- as.Date(fan.full$Date, "%m/%d/%Y")
 
-## quick cliean
+## quick clean
 full.data <- fan.full %>%
   select(week = Week, name = Name, position = Position, team = Team, home.away = Home.Away, opponent = Opponent, fanduel.pts = FanDuel.pts, fanduel.sal = FanDuel.sal, date = Date, location = Location, cmp:pts_allowed)
+
+## hard code tiers of skill positions
+# add column with average fanduel pts for week for position
+fd.desc <- full.data %>%
+  group_by(position, week) %>%
+  mutate(pos.avg = mean(fanduel.pts, na.rm = TRUE),
+         pos.sal.avg = mean(fanduel.sal, na.rm = TRUE), 
+         pts.dif = fanduel.pts - pos.avg,
+         sal.dif = fanduel.sal - pos.sal.avg,
+         pts.per.sal = fanduel.pts / fanduel.sal,
+         pts.per.sal.avg = mean(fanduel.pts / fanduel.sal)) %>%
+  group_by(name) %>%
+  mutate(plyr.avg = mean(fanduel.pts, na.rm = TRUE),
+         plyr.sal.avg = mean(fanduel.sal, na.rm = TRUE),
+         plyr.pts.sd = sd(pts.dif, na.rm = TRUE),
+         plyr.sal.sd = sd(sal.dif, na.rm = TRUE),
+         pts.per.sal.avg = mean(pts.per.sal, na.rm = TRUE),
+         pts.per.sal.sd = sd(pts.per.sal, na.rm = TRUE))
+
+## removes duplicates and NAs and only includes players that scored fanduel.pts
+plyr.set <- fd.desc %>% 
+  select(name:team, pos.avg:pos.sal.avg, pts.per.sal.avg:pts.per.sal.sd) %>%
+  distinct(name) %>%
+  ungroup() %>%
+  filter(!is.na(plyr.pts.sd), !is.na(plyr.sal.sd)) %>%
+  arrange(desc(pts.per.sal.avg), desc(pts.per.sal.sd))
+View(plyr.set)
 
 ## output full data here
 write.csv(full.data, "/Users/brett/GitHub/proj-fantasy/final_dataset.csv")
