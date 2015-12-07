@@ -1,13 +1,16 @@
-data.packages <- c('dplyr', 'ggplot2', 'RColorBrewer', 'ggthemes', 'scales', 'tidyr', 'MASS', 'devtools', 'lubridate', 'mosaic')
+
+#### housekeeping ####
+data.packages <- c('dplyr', 'ggplot2', 'RColorBrewer', 'RCurl', 'ggthemes', 'ggExtra', 'gridExtra', 'scales', 'tidyr', 'MASS', 'devtools', 'lubridate', 'mosaic')
 lapply(data.packages, library, character.only = T)
 
 ## redefine select from dplyr because MASS package causes issues
 select <- dplyr::select
 
-## import raw data as a table
-salary <- tbl_df(read.csv("/Users/brett/GitHub/proj-fantasy/data/salary.csv", header = TRUE, ";", skipNul = FALSE, stringsAsFactors = FALSE))
+#### bring in salary data from fanduel ####
+## get data from github and import as a table
+salary <- tbl_df(read.csv("https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/salary.csv", header = TRUE, ";", skipNul = FALSE, stringsAsFactors = FALSE))
 
-#### clean up
+#### clean up ####
 ## remove gid column and filter out def for name format reshape remove salaries that are 0 as these players weren't available
 no.def <- salary %>%
   select(Season = Year, Week, Name, Position = Pos, Team, Home.Away = h.a, Opponent = Oppt, FanDuel.pts = FD.points, FanDuel.sal = FD.salary) %>% 
@@ -47,7 +50,7 @@ clean.lu$FanDuel.sal <- as.double(clean.lu$FanDuel.sal)
 write.csv(clean.lu, "/Users/brett/GitHub/proj-fantasy/data/fanduel_2015_season_summary.csv")
 
 ## import profootref data
-pro.foot.ref <- tbl_df(read.csv("/Users/brett/GitHub/proj-fantasy/data/fantasy_data_20151202.csv", header = TRUE, skipNul = FALSE, stringsAsFactors = FALSE))
+pro.foot.ref <- tbl_df(read.csv("https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/fantasy_data_20151202.csv", header = TRUE, skipNul = FALSE, stringsAsFactors = FALSE))
 
 ## have to add home.away and reuse lookup table
 Home.Away <- c(" ")
@@ -82,8 +85,8 @@ fan.full$Date <- as.Date(fan.full$Date, "%m/%d/%Y")
 full.data <- fan.full %>%
   select(week = Week, name = Name, position = Position, team = Team, home.away = Home.Away, opponent = Opponent, fanduel.pts = FanDuel.pts, fanduel.sal = FanDuel.sal, date = Date, location = Location, cmp:pts_allowed)
 
-## hard code tiers of skill positions
-# add column with average fanduel pts for week for position
+#### create metrics/tiers ####
+## add column with average fanduel pts for week for position
 fd.desc <- full.data %>%
   group_by(position, week) %>%
   mutate(pos.avg = mean(fanduel.pts, na.rm = TRUE),
@@ -107,7 +110,37 @@ plyr.set <- fd.desc %>%
   ungroup() %>%
   filter(!is.na(plyr.pts.sd), !is.na(plyr.sal.sd)) %>%
   arrange(desc(pts.per.sal.avg), desc(pts.per.sal.sd))
-View(plyr.set)
 
-## output full data here
-write.csv(full.data, "/Users/brett/GitHub/proj-fantasy/final_dataset.csv")
+# this just helps me see
+ggplot(plyr.set,
+       aes(x = pts.per.sal.avg)) + 
+  geom_histogram() + 
+  labs(x = "points per dollar") +
+  theme_tufte(16)
+  
+# create tiered threshold values based on quantile
+tiers <- tbl_df(data.frame(quantile(plyr.set$pts.per.sal.avg, probs = c(.7, .8, .9))))
+rownames(tiers) <- c("Bronze", "Silver", "Gold")
+colnames(tiers) <- c("threshold")
+limits <- t(tiers)
+
+plyrs <- plyr.set %>%
+  mutate(tier = derivedFactor(
+    "primary" = (position %in% c("QB", "RB", "WR", "TE", "PK", "DEF") & pts.per.sal.avg >= limits[1,3]),
+    "secondary" = (position %in% c("QB", "RB", "WR", "TE", "PK", "DEF") & pts.per.sal.avg >= limits[1,2] & pts.per.sal.avg < limits[1,3]),
+    "tertiary" = (position %in% c("QB", "RB", "WR", "TE", "PK", "DEF") & pts.per.sal.avg >= limits[1,1] & pts.per.sal.avg < limits[1,2]),
+    .method = "first",
+    .default = NA
+  ))
+
+# filter out na's
+opti.plyrs <- plyrs %>%
+  filter(!is.na(tier))
+
+# left with final optimal player list
+opti.plyrs %>%
+  group_by(position) %>%
+  summarise(count = n())
+
+#### output full data here ####
+write.csv(full.data, "/Users/brett/GitHub/proj-fantasy/data/optimal_player_list.csv")
