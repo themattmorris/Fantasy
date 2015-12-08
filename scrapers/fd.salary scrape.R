@@ -1,6 +1,8 @@
+#### housekeeping ####
 packages <- c('rvest', 'knitr', 'pipeR', 'MASS')
 lapply(packages, library, character.only = T)
 
+#### create list of season 2015 results ####
 fd.sites <- c("http://rotoguru1.com/cgi-bin/fyday.pl?week=12&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=11&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=10&game=fd&scsv=1",
@@ -16,6 +18,7 @@ fd.sites <- c("http://rotoguru1.com/cgi-bin/fyday.pl?week=12&game=fd&scsv=1",
 
 d <- matrix(nrow = 12, ncol = 1)
 
+#### for loop to scrape results and output a csv ####
 for (i in 1:12) {
   ## loop through pages above
   roto <- fd.sites[i]

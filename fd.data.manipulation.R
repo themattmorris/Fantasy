@@ -126,16 +126,18 @@ limits <- t(tiers)
 
 plyrs <- plyr.set %>%
   mutate(tier = derivedFactor(
-    "primary" = (position %in% c("QB", "RB", "WR", "TE", "PK", "DEF") & pts.per.sal.avg >= limits[1,3]),
-    "secondary" = (position %in% c("QB", "RB", "WR", "TE", "PK", "DEF") & pts.per.sal.avg >= limits[1,2] & pts.per.sal.avg < limits[1,3]),
-    "tertiary" = (position %in% c("QB", "RB", "WR", "TE", "PK", "DEF") & pts.per.sal.avg >= limits[1,1] & pts.per.sal.avg < limits[1,2]),
+    "primary" = (position %in% c("QB", "RB", "WR", "TE", "K", "DEF") & pts.per.sal.avg >= limits[1,3]),
+    "secondary" = (position %in% c("QB", "RB", "WR", "TE", "K", "DEF") & pts.per.sal.avg >= limits[1,2] & pts.per.sal.avg < limits[1,3]),
+    "tertiary" = (position %in% c("QB", "RB", "WR", "TE", "K", "DEF") & pts.per.sal.avg >= limits[1,1] & pts.per.sal.avg < limits[1,2]),
     .method = "first",
     .default = NA
   ))
 
 # filter out na's
 opti.plyrs <- plyrs %>%
-  filter(!is.na(tier))
+  select(name:team, pts.per.sal.avg, pts.per.sal.sd, tier) %>%
+  filter(!is.na(tier)) %>%
+  select(name:team, pts.per.sal.avg, pts.per.sal.sd)
 
 # left with final optimal player list
 opti.plyrs %>%
