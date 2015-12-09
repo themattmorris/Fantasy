@@ -1,61 +1,87 @@
-import pandas as pd
-import io
-import requests
-from optparse import OptionParser
-from itertools import groupby
 from openopt import *
-from FuncDesigner import *
+import csv
+from pprint import pprint
 
-'''
-grab projections columns and id column from projection csv and merge with player list from FanDuel league
-'''
-fields1 = ['Name', 'Id', 'Projection',]
-fields2 = ['Id', 'Position', 'FPPG', 'Salary', 'Team', 'Opponent', 'Injury Indicator']
 
-'''
-import two csvs
-'''
-url1 = "https://raw.githubusercontent.com/brttstl/proj-fantasy/master/final/week_13_projections.csv"
-url2 = "https://raw.githubusercontent.com/brttstl/proj-fantasy/master/final/FanDuel-NFL-2015-12-13-13913-players-list.csv"
-projs = requests.get(url1).content
-plyrs = requests.get(url2).content
-df1 = pd.read_csv(io.StringIO(projs.decode('utf-8')), usecols=fields1)
-df2 = pd.read_csv(io.StringIO(plyrs.decode('utf-8')), usecols=fields2)
+def load_projections(projections_file):
+    projections = {}
+    with open(projections_file, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            projections[row[0]] = float(row[1])
+    return projections
+        
 
-'''
-merge datasets
-'''
-merged = df1.merge(df2, on="Id").fillna("")
-merged = merged.drop('Id', 1)
-merged.columns = ['name', 'projection',	'position', 'fppg', 'salary', 'team', 'opponent', 'injury']
+def optimizer(projections=None, site="DraftKings"):
 
-'''
-remove injury risks
-'''
-injured = ['IR', 'O', 'Q']
-healthy = merged[~merged.injury.isin(injured)]
+    adjustments = {'Kevin Martin': 0.0, #injury
+                   'Derrick Rose': 0.0, #crap player
+                   'Stephen Curry': 0.0
+                  }
 
-'''
-write to csv for sake keeping
-'''
-healthy.to_csv("/Users/brett/GitHub/proj-fantasy/final/final_merged_projections.csv", index=False)
+    items = []
+    player_ids = {}
 
-maxSalary = 60000
-options.stackLimit = 4
+    with open('DKSalaries_11272014.csv', 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        index = 0
+        for row in reader:
+            if index != 0:
+                vals = { 
+                        'id': index-1,
+                        'PG': 1 if row[0] == 'PG' else 0,
+                        'SG': 1 if row[0] == 'SG' else 0,
+                        'SF': 1 if row[0] == 'SF' else 0,
+                        'PF': 1 if row[0] == 'PF' else 0,
+                        'C': 1 if row[0] == 'C' else 0,
+                        'name': row[1],
+                        'salary': int(row[2]),
+                        'fpts': float(row[4]) if row[1] not in adjustments.keys() else adjustments[row[1]]
+                        }
+                vals['PGSGC'] = vals['PG'] + vals['SG'] + vals['C']
+                vals['PFSFC'] = vals['PF'] + vals['SF'] + vals['C']
+                if projections != None:
+                    vals['fpts'] = projections[vals['name']]
+                items.append(vals)
+            index += 1
 
-# constrain positions, salary, num players per team
-constraints = lambda values: (values['salary'] <= maxSalary, values['QB'] == 1, values['RB'] == 2, values['WR'] == 3, values['TE'] == 1, values['K'] == 1, values['D'] == 1,
-                              values["ARI"] < options.stackLimit, values["ATL"] < options.stackLimit, values["BAL"] < options.stackLimit, values["BUF"] < options.stackLimit,
-                              values["CAR"] < options.stackLimit, values["CHI"] < options.stackLimit, values["CIN"] < options.stackLimit, values["CLE"] < options.stackLimit,
-                              values["DAL"] < options.stackLimit, values["DEN"] < options.stackLimit, values["DET"] < options.stackLimit, values["HOU"] < options.stackLimit,
-                              values["IND"] < options.stackLimit, values["JAC"] < options.stackLimit, values["KC"] < options.stackLimit, values["MIA"] < options.stackLimit,
-                              values["MIN"] < options.stackLimit, values["NE"] < options.stackLimit, values["NO"] < options.stackLimit, values["NYG"] < options.stackLimit,
-                              values["NYJ"] < options.stackLimit, values["OAK"] < options.stackLimit, values["PHI"] < options.stackLimit, values["PIT"] < options.stackLimit,
-                              values["SD"] < options.stackLimit, values["SEA"] < options.stackLimit, values["SF"] < options.stackLimit, values["STL"] < options.stackLimit,
-                              values["TB"] < options.stackLimit, values["TEN"] < options.stackLimit, values["WAS"])
-objective = "projection"
+    for item in items:
+        for i in range(len(items)):
+            item['id%d' % i] = float(item['id'] == i)
 
-p = KSP(objective, healthy.projection, goal='max', constraints = constraints)
-r = p.solve('glpk')
+    constraints = lambda values: (
+                              values['salary'] < 50000, 
+                              values['nItems'] == 8, 
+                              values['PG'] >= 1,
+                              values['PG'] <= 2,
+                              values['SG'] >= 1,
+                              values['SG'] <= 2,
+                              values['SF'] >= 1,
+                              values['SF'] <= 2,
+                              values['PF'] >= 1,
+                              values['PF'] <= 2,
+                              values['PFSFC'] >= 4,
+                              values['PFSFC'] <= 5,
+                              values['PGSGC'] >= 4,
+                              values['PGSGC'] <= 5,
+                             ) + tuple([values['id%d'% i] <= 1 for i in range(len(items))])
 
-print(r.xf)
+
+                                  # we could use lambda-func, e,g.
+                                  # values['mass'] + 4*values['volume'] < 100
+    objective = 'fpts'
+    # we could use lambda-func, e.g. 
+    # objective = lambda val: 5*value['cost'] - 2*value['volume'] - 5*value['mass'] + 3*val['nItems']
+    p = KSP(objective, items, goal = 'max', constraints = constraints) 
+    r = p.solve('glpk', iprint = 0) # requires cvxopt and glpk installed, see http://openopt.org/KSP for other solvers
+    ''' Results for Intel Atom 1.6 GHz:
+    ------------------------- OpenOpt 0.50 -------------------------
+    solver: glpk   problem: unnamed    type: MILP   goal: max
+     iter   objFunVal   log10(maxResidual)   
+        0  0.000e+00               0.70 
+        1  2.739e+01            -100.00 
+    istop: 1000 (optimal)
+    Solver:   Time Elapsed = 0.82   CPU Time Elapsed = 0.82
+    objFunValue: 27.389749 (feasible, MaxResidual = 0)
+    '''
+    print(r.xf) 
