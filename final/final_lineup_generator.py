@@ -22,11 +22,12 @@ merge datasets
 '''
 merged = df1.merge(df2, on="Id").fillna("")
 merged = merged.drop('Id', 1)
+merged.columns = ['name', 'projection',	'position', 'fppg', 'salary', 'team', 'opponent', 'injury']
 '''
 remove injury risks
 '''
-healthy = merged.loc[merged['Injury Indicator'].isin(["P",
+value_list = ['IR', 'Q']
+healthy = merged[~merged.injury.isin(value_list)]
 
 
-
-healthy.to_csv("/Users/brett/GitHub/proj-fantasy/final/finalprojmerged.csv", index=False)
+healthy.to_csv("/Users/brett/GitHub/proj-fantasy/final/final_merged_projections.csv", index=False)
