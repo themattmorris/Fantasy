@@ -1,129 +1,33 @@
-"location","team","city","state","stadium_name","capacity","surface_type","surface_description","roof_type","season"
-"ARI","Arizona Cardinals","Glendale","Arizona","University of Phoenix Stadium",63400,"Hybrid","Tifway 419 Bermuda Grass","Retractable",2015
-"ATL","Atlanta Falcons","Atlanta","Georgia","Georgia Dome",71250,"Turf","FieldTurf Classic HD","Domed",2015
-"BAL","Baltimore Ravens","Baltimore","Maryland","M&T Bank Stadium",71008,"Turf","Shaw Sports Momentum 51","Open",2015
-"BUF","Buffalo Bills","Orchard Park","New York","Ralph Wilson Stadium",73079,"Turf","A-Turf Titan","Open",2015
-"CAR","Carolina Panthers","Charlotte","North Carolina","Bank of America Stadium",73778,"Hybrid","Voyager Bermuda Grass","Open",2015
-"CHI","Chicago Bears","Chicago","Illinois","Soldier Field",61500,"Grass","Kentucky Bluegrass","Open",2015
-"CIN","Cincinnati Bengals","Cincinnati","Ohio","Paul Brown Stadium",65515,"Turf","UBU Speed Series S5-M Synthetic Turf","Open",2015
-"CLE","Cleveland Browns","Cleveland","Ohio","FirstEnergy Stadium",67431,"Grass","Kentucky Bluegrass","Open",2015
-"DAL","Dallas Cowboys","Arlington","Texas","AT&T Stadium",80000,"Turf","Matrix RealGrass artificial turf[6]","Retractable",2015
-"DEN","Denver Broncos","Denver","Colorado","Sports Authority Field at Mile High",76125,"Grass","Kentucky Bluegrass","Open",2015
-"DET","Detroit Lions","Detroit","Michigan","Ford Field",65000,"Turf","FieldTurf Classic HD","Domed",2015
-"GNB","Green Bay Packers","Green Bay","Wisconsin","Lambeau Field",81435,"Hybrid","Desso GrassMaster","Open",2015
-"HOU","Houston Texans","Houston","Texas","NRG Stadium",71500,"Turf","AstroTurf GameDay Grass 3D","Retractable",2015
-"IND","Indianapolis Colts","Indianapolis","Indiana","Lucas Oil Stadium",67000,"Turf","FieldTurf Classic HD","Retractable",2015
-"JAX","Jacksonville Jaguars","Jacksonville","Florida","EverBank Field",67246,"Hybrid","Tifway 419 Bermuda Grass","Open",2015
-"KAN","Kansas City Chiefs","Kansas City","Missouri","Arrowhead Stadium",76416,"Hybrid","Latitude 36 Bermuda Grass","Open",2015
-"MIA","Miami Dolphins","Miami Gardens","Florida","Sun Life Stadium",65000,"Turf","Prescription Athletic Turf (Tifway 419 Bermuda Grass)","Open",2015
-"MIN","Minnesota Vikings","Minneapolis","Minnesota","TCF Bank Stadium",52525,"Turf","FieldTurf Revolution","Open",2015
-"NWE","New England Patriots","Foxborough","Massachusetts","Gillette Stadium",68756,"Turf","FieldTurf Revolution","Open",2015
-"NOR","New Orleans Saints","New Orleans","Louisiana","Mercedes-Benz Superdome",73000,"Turf","UBU Speed Series S5-M Synthetic Turf","Domed",2015
-"NYG","New York Giants","East Rutherford","New Jersey","MetLife Stadium",82500,"Turf","UBU Speed Series S5-M Synthetic Turf","Open",2015
-"NYJ","New York Jets","East Rutherford","New Jersey","MetLife Stadium",82500,"Turf","UBU Speed Series S5-M Synthetic Turf","Open",2015
-"OAK","Oakland Raiders","Oakland","California","O.co Coliseum",56057,"Hybrid","Tifway II Bermuda Grass","Open",2015
-"PHI","Philadelphia Eagles","Philadelphia","Pennsylvania","Lincoln Financial Field",69596,"Hybrid","Desso GrassMaster","Open",2015
-"PIT","Pittsburgh Steelers","Pittsburgh","Pennsylvania","Heinz Field",68400,"Grass","Kentucky Bluegrass","Open",2015
-"SDG","San Diego Chargers","San Diego","California","Qualcomm Stadium",70561,"Hybrid","Bandera Bermuda Grass","Open",2015
-"SFO","San Francisco 49ers","Santa Clara","California","Levi's Stadium",68500,"Hybrid","Tifway II Bermuda Grass / Perennial Ryegrass mixture","Open",2015
-"SEA","Seattle Seahawks","Seattle","Washington","CenturyLink Field",67000,"Turf","FieldTurf Revolution","Open",2015
-"STL","St. Louis Rams","St. Louis","Missouri","Edward Jones Dome",66000,"Turf","AstroTurf GameDay Grass 3D","Domed",2015
-"TAM","Tampa Bay Buccaneers","Tampa","Florida","Raymond James Stadium",65890,"Hybrid","Tifway 419 Bermuda Grass","Open",2015
-"TEN","Tennessee Titans","Nashville","Tennessee","Nissan Stadium",69149,"Hybrid","TifSport Bermuda Grass","Open",2015
-"WAS","Washington Redskins","Landover","Maryland","FedEx Field",73000,"Hybrid","Latitude 36 Bermuda Grass","Open",2015
-"ARI","Arizona Cardinals","Glendale","Arizona","University of Phoenix Stadium",63400,"Hybrid","Tifway 419 Bermuda Grass","Retractable",2014
-"ATL","Atlanta Falcons","Atlanta","Georgia","Georgia Dome",71250,"Turf","FieldTurf Classic HD","Domed",2014
-"BAL","Baltimore Ravens","Baltimore","Maryland","M&T Bank Stadium",71008,"Turf","Shaw Sports Momentum 51","Open",2014
-"BUF","Buffalo Bills","Orchard Park","New York","Ralph Wilson Stadium",73079,"Turf","A-Turf Titan","Open",2014
-"CAR","Carolina Panthers","Charlotte","North Carolina","Bank of America Stadium",73778,"Hybrid","Voyager Bermuda Grass[10]","Open",2014
-"CHI","Chicago Bears","Chicago","Illinois","Soldier Field",61500,"Grass","Kentucky Bluegrass","Open",2014
-"CIN","Cincinnati Bengals","Cincinnati","Ohio","Paul Brown Stadium",65515,"Turf","UBU Speed Series S5-M Synthetic Turf","Open",2014
-"CLE","Cleveland Browns","Cleveland","Ohio","FirstEnergy Stadium",67431,"Grass","Kentucky Bluegrass","Open",2014
-"DAL","Dallas Cowboys","Arlington","Texas","AT&T Stadium",80000,"Turf","Matrix RealGrass artificial turf[6]","Retractable",2014
-"DEN","Denver Broncos","Denver","Colorado","Sports Authority Field at Mile High",76125,"Grass","Kentucky Bluegrass","Open",2014
-"DET","Detroit Lions","Detroit","Michigan","Ford Field",65000,"Turf","FieldTurf Classic HD","Domed",2014
-"GNB","Green Bay Packers","Green Bay","Wisconsin","Lambeau Field",81435,"Hybrid","Desso GrassMaster","Open",2014
-"HOU","Houston Texans","Houston","Texas","NRG Stadium",71500,"Turf","AstroTurf GameDay Grass 3D","Retractable",2014
-"IND","Indianapolis Colts","Indianapolis","Indiana","Lucas Oil Stadium",67000,"Turf","FieldTurf Classic HD","Retractable",2014
-"JAX","Jacksonville Jaguars","Jacksonville","Florida","EverBank Field",67246,"Hybrid","Tifway 419 Bermuda Grass","Open",2014
-"KAN","Kansas City Chiefs","Kansas City","Missouri","Arrowhead Stadium",76416,"Hybrid","Latitude 36 Bermuda Grass","Open",2014
-"MIA","Miami Dolphins","Miami Gardens","Florida","Sun Life Stadium",65000,"Turf","Prescription Athletic Turf (Tifway 419 Bermuda Grass)","Open",2014
-"MIN","Minnesota Vikings","Minneapolis","Minnesota","TCF Bank Stadium",52525,"Turf","FieldTurf Revolution","Open",2014
-"NWE","New England Patriots","Foxborough","Massachusetts","Gillette Stadium",68756,"Turf","FieldTurf Revolution","Open",2014
-"NOR","New Orleans Saints","New Orleans","Louisiana","Mercedes-Benz Superdome",73000,"Turf","UBU Speed Series S5-M Synthetic Turf","Domed",2014
-"NYG","New York Giants","East Rutherford","New Jersey","MetLife Stadium",82500,"Turf","UBU Speed Series S5-M Synthetic Turf","Open",2014
-"NYJ","New York Jets","East Rutherford","New Jersey","MetLife Stadium",82500,"Turf","UBU Speed Series S5-M Synthetic Turf","Open",2014
-"OAK","Oakland Raiders","Oakland","California","O.co Coliseum",56057,"Hybrid","Tifway II Bermuda Grass","Open",2014
-"PHI","Philadelphia Eagles","Philadelphia","Pennsylvania","Lincoln Financial Field",69596,"Hybrid","Desso GrassMaster","Open",2014
-"PIT","Pittsburgh Steelers","Pittsburgh","Pennsylvania","Heinz Field",68400,"Grass","Kentucky Bluegrass","Open",2014
-"SDG","San Diego Chargers","San Diego","California","Qualcomm Stadium",70561,"Hybrid","Bandera Bermuda Grass","Open",2014
-"SFO","San Francisco 49ers","Santa Clara","California","Levi's Stadium",68500,"Hybrid","Tifway II Bermuda Grass / Perennial Ryegrass mixture","Open",2014
-"SEA","Seattle Seahawks","Seattle","Washington","CenturyLink Field",67000,"Turf","FieldTurf Revolution","Open",2014
-"STL","St. Louis Rams","St. Louis","Missouri","Edward Jones Dome",66000,"Turf","AstroTurf GameDay Grass 3D","Domed",2014
-"TAM","Tampa Bay Buccaneers","Tampa","Florida","Raymond James Stadium",65890,"Hybrid","Tifway 419 Bermuda Grass","Open",2014
-"TEN","Tennessee Titans","Nashville","Tennessee","Nissan Stadium",69149,"Hybrid","TifSport Bermuda Grass","Open",2014
-"WAS","Washington Redskins","Landover","Maryland","FedEx Field",73000,"Hybrid","Latitude 36 Bermuda Grass","Open",2014
-"ARI","Arizona Cardinals","Glendale","Arizona","University of Phoenix Stadium",63400,"Hybrid","Tifway 419 Bermuda Grass","Retractable",2013
-"ATL","Atlanta Falcons","Atlanta","Georgia","Georgia Dome",71250,"Turf","FieldTurf Classic HD","Domed",2013
-"BAL","Baltimore Ravens","Baltimore","Maryland","M&T Bank Stadium",71008,"Turf","Shaw Sports Momentum 51","Open",2013
-"BUF","Buffalo Bills","Orchard Park","New York","Ralph Wilson Stadium",73079,"Turf","A-Turf Titan","Open",2013
-"CAR","Carolina Panthers","Charlotte","North Carolina","Bank of America Stadium",73778,"Hybrid","Voyager Bermuda Grass[10]","Open",2013
-"CHI","Chicago Bears","Chicago","Illinois","Soldier Field",61500,"Grass","Kentucky Bluegrass","Open",2013
-"CIN","Cincinnati Bengals","Cincinnati","Ohio","Paul Brown Stadium",65515,"Turf","UBU Speed Series S5-M Synthetic Turf","Open",2013
-"CLE","Cleveland Browns","Cleveland","Ohio","FirstEnergy Stadium",67431,"Grass","Kentucky Bluegrass","Open",2013
-"DAL","Dallas Cowboys","Arlington","Texas","AT&T Stadium",80000,"Turf","Matrix RealGrass artificial turf[6]","Retractable",2013
-"DEN","Denver Broncos","Denver","Colorado","Sports Authority Field at Mile High",76125,"Grass","Kentucky Bluegrass","Open",2013
-"DET","Detroit Lions","Detroit","Michigan","Ford Field",65000,"Turf","FieldTurf Classic HD","Domed",2013
-"GNB","Green Bay Packers","Green Bay","Wisconsin","Lambeau Field",81435,"Hybrid","Desso GrassMaster","Open",2013
-"HOU","Houston Texans","Houston","Texas","NRG Stadium",71500,"Turf","AstroTurf GameDay Grass 3D","Retractable",2013
-"IND","Indianapolis Colts","Indianapolis","Indiana","Lucas Oil Stadium",67000,"Turf","FieldTurf Classic HD","Retractable",2013
-"JAX","Jacksonville Jaguars","Jacksonville","Florida","EverBank Field",67246,"Hybrid","Tifway 419 Bermuda Grass","Open",2013
-"KAN","Kansas City Chiefs","Kansas City","Missouri","Arrowhead Stadium",76416,"Hybrid","Latitude 36 Bermuda Grass","Open",2013
-"MIA","Miami Dolphins","Miami Gardens","Florida","Sun Life Stadium",65000,"Turf","Prescription Athletic Turf (Tifway 419 Bermuda Grass)","Open",2013
-"MIN","Minnesota Vikings","Minneapolis","Minnesota","Hubert H. Humphrey Metrodome",64121,"Turf","UBU-Intensity Series-S5-M Synthetic Turf","Domed",2013
-"NWE","New England Patriots","Foxborough","Massachusetts","Gillette Stadium",68756,"Turf","FieldTurf Revolution","Open",2013
-"NOR","New Orleans Saints","New Orleans","Louisiana","Mercedes-Benz Superdome",73000,"Turf","UBU Speed Series S5-M Synthetic Turf","Domed",2013
-"NYG","New York Giants","East Rutherford","New Jersey","MetLife Stadium",82500,"Turf","UBU Speed Series S5-M Synthetic Turf","Open",2013
-"NYJ","New York Jets","East Rutherford","New Jersey","MetLife Stadium",82500,"Turf","UBU Speed Series S5-M Synthetic Turf","Open",2013
-"OAK","Oakland Raiders","Oakland","California","O.co Coliseum",56057,"Hybrid","Tifway II Bermuda Grass","Open",2013
-"PHI","Philadelphia Eagles","Philadelphia","Pennsylvania","Lincoln Financial Field",69596,"Hybrid","Desso GrassMaster","Open",2013
-"PIT","Pittsburgh Steelers","Pittsburgh","Pennsylvania","Heinz Field",68400,"Grass","Kentucky Bluegrass","Open",2013
-"SDG","San Diego Chargers","San Diego","California","Qualcomm Stadium",70561,"Hybrid","Bandera Bermuda Grass","Open",2013
-"SFO","San Francisco 49ers","San Francisco","California","Candlestick Park",69732,"Grass","Kentucky Bluegrass","Open",2013
-"SEA","Seattle Seahawks","Seattle","Washington","CenturyLink Field",67000,"Turf","FieldTurf Revolution","Open",2013
-"STL","St. Louis Rams","St. Louis","Missouri","Edward Jones Dome",66000,"Turf","AstroTurf GameDay Grass 3D","Domed",2013
-"TAM","Tampa Bay Buccaneers","Tampa","Florida","Raymond James Stadium",65890,"Hybrid","Tifway 419 Bermuda Grass","Open",2013
-"TEN","Tennessee Titans","Nashville","Tennessee","Nissan Stadium",69149,"Hybrid","TifSport Bermuda Grass","Open",2013
-"WAS","Washington Redskins","Landover","Maryland","FedEx Field",73000,"Hybrid","Latitude 36 Bermuda Grass","Open",2013
-"ARI","Arizona Cardinals","Glendale","Arizona","University of Phoenix Stadium",63400,"Hybrid","Tifway 419 Bermuda Grass","Retractable",2012
-"ATL","Atlanta Falcons","Atlanta","Georgia","Georgia Dome",71250,"Turf","FieldTurf Classic HD","Domed",2012
-"BAL","Baltimore Ravens","Baltimore","Maryland","M&T Bank Stadium",71008,"Turf","Shaw Sports Momentum 51","Open",2012
-"BUF","Buffalo Bills","Orchard Park","New York","Ralph Wilson Stadium",73079,"Turf","A-Turf Titan","Open",2012
-"CAR","Carolina Panthers","Charlotte","North Carolina","Bank of America Stadium",73778,"Hybrid","Voyager Bermuda Grass[10]","Open",2012
-"CHI","Chicago Bears","Chicago","Illinois","Soldier Field",61500,"Grass","Kentucky Bluegrass","Open",2012
-"CIN","Cincinnati Bengals","Cincinnati","Ohio","Paul Brown Stadium",65515,"Turf","UBU Speed Series S5-M Synthetic Turf","Open",2012
-"CLE","Cleveland Browns","Cleveland","Ohio","FirstEnergy Stadium",67431,"Grass","Kentucky Bluegrass","Open",2012
-"DAL","Dallas Cowboys","Arlington","Texas","AT&T Stadium",80000,"Turf","Matrix RealGrass artificial turf[6]","Retractable",2012
-"DEN","Denver Broncos","Denver","Colorado","Sports Authority Field at Mile High",76125,"Grass","Kentucky Bluegrass","Open",2012
-"DET","Detroit Lions","Detroit","Michigan","Ford Field",65000,"Turf","FieldTurf Classic HD","Domed",2012
-"GNB","Green Bay Packers","Green Bay","Wisconsin","Lambeau Field",81435,"Hybrid","Desso GrassMaster","Open",2012
-"HOU","Houston Texans","Houston","Texas","NRG Stadium",71500,"Turf","AstroTurf GameDay Grass 3D","Retractable",2012
-"IND","Indianapolis Colts","Indianapolis","Indiana","Lucas Oil Stadium",67000,"Turf","FieldTurf Classic HD","Retractable",2012
-"JAX","Jacksonville Jaguars","Jacksonville","Florida","EverBank Field",67246,"Hybrid","Tifway 419 Bermuda Grass","Open",2012
-"KAN","Kansas City Chiefs","Kansas City","Missouri","Arrowhead Stadium",76416,"Hybrid","Latitude 36 Bermuda Grass","Open",2012
-"MIA","Miami Dolphins","Miami Gardens","Florida","Sun Life Stadium",65000,"Turf","Prescription Athletic Turf (Tifway 419 Bermuda Grass)","Open",2012
-"MIN","Minnesota Vikings","Minneapolis","Minnesota","Hubert H. Humphrey Metrodome",64121,"Turf","UBU-Intensity Series-S5-M Synthetic Turf","Domed",2012
-"NWE","New England Patriots","Foxborough","Massachusetts","Gillette Stadium",68756,"Turf","FieldTurf Revolution","Open",2012
-"NOR","New Orleans Saints","New Orleans","Louisiana","Mercedes-Benz Superdome",73000,"Turf","UBU Speed Series S5-M Synthetic Turf","Domed",2012
-"NYG","New York Giants","East Rutherford","New Jersey","MetLife Stadium",82500,"Turf","UBU Speed Series S5-M Synthetic Turf","Open",2012
-"NYJ","New York Jets","East Rutherford","New Jersey","MetLife Stadium",82500,"Turf","UBU Speed Series S5-M Synthetic Turf","Open",2012
-"OAK","Oakland Raiders","Oakland","California","O.co Coliseum",56057,"Hybrid","Tifway II Bermuda Grass","Open",2012
-"PHI","Philadelphia Eagles","Philadelphia","Pennsylvania","Lincoln Financial Field",69596,"Hybrid","Desso GrassMaster","Open",2012
-"PIT","Pittsburgh Steelers","Pittsburgh","Pennsylvania","Heinz Field",68400,"Grass","Kentucky Bluegrass","Open",2012
-"SDG","San Diego Chargers","San Diego","California","Qualcomm Stadium",70561,"Hybrid","Bandera Bermuda Grass","Open",2012
-"SFO","San Francisco 49ers","San Francisco","California","Candlestick Park",69732,"Grass","Kentucky Bluegrass","Open",2012
-"SEA","Seattle Seahawks","Seattle","Washington","CenturyLink Field",67000,"Turf","FieldTurf Revolution","Open",2012
-"STL","St. Louis Rams","St. Louis","Missouri","Edward Jones Dome",66000,"Turf","AstroTurf GameDay Grass 3D","Domed",2012
-"TAM","Tampa Bay Buccaneers","Tampa","Florida","Raymond James Stadium",65890,"Hybrid","Tifway 419 Bermuda Grass","Open",2012
-"TEN","Tennessee Titans","Nashville","Tennessee","Nissan Stadium",69149,"Hybrid","TifSport Bermuda Grass","Open",2012
-"WAS","Washington Redskins","Landover","Maryland","FedEx Field",73000,"Hybrid","Latitude 36 Bermuda Grass","Open",2012
+location,team,city,state,stadium_name,capacity,surface_type,surface_description,roof_type,season
+ARI,Arizona Cardinals,Glendale,Arizona,University of Phoenix Stadium,63400,Hybrid,Tifway 419 Bermuda Grass,Retractable,2015
+ATL,Atlanta Falcons,Atlanta,Georgia,Georgia Dome,71250,Turf,FieldTurf Classic HD,Domed,2015
+BAL,Baltimore Ravens,Baltimore,Maryland,M&T Bank Stadium,71008,Turf,Shaw Sports Momentum 51,Open,2015
+BUF,Buffalo Bills,Orchard Park,New York,Ralph Wilson Stadium,73079,Turf,A-Turf Titan,Open,2015
+CAR,Carolina Panthers,Charlotte,North Carolina,Bank of America Stadium,73778,Hybrid,Voyager Bermuda Grass,Open,2015
+CHI,Chicago Bears,Chicago,Illinois,Soldier Field,61500,Grass,Kentucky Bluegrass,Open,2015
+CIN,Cincinnati Bengals,Cincinnati,Ohio,Paul Brown Stadium,65515,Turf,UBU Speed Series S5-M Synthetic Turf,Open,2015
+CLE,Cleveland Browns,Cleveland,Ohio,FirstEnergy Stadium,67431,Grass,Kentucky Bluegrass,Open,2015
+DAL,Dallas Cowboys,Arlington,Texas,AT&T Stadium,80000,Turf,Matrix RealGrass artificial turf[6],Retractable,2015
+DEN,Denver Broncos,Denver,Colorado,Sports Authority Field at Mile High,76125,Grass,Kentucky Bluegrass,Open,2015
+DET,Detroit Lions,Detroit,Michigan,Ford Field,65000,Turf,FieldTurf Classic HD,Domed,2015
+GNB,Green Bay Packers,Green Bay,Wisconsin,Lambeau Field,81435,Hybrid,Desso GrassMaster,Open,2015
+HOU,Houston Texans,Houston,Texas,NRG Stadium,71500,Turf,AstroTurf GameDay Grass 3D,Retractable,2015
+IND,Indianapolis Colts,Indianapolis,Indiana,Lucas Oil Stadium,67000,Turf,FieldTurf Classic HD,Retractable,2015
+JAX,Jacksonville Jaguars,Jacksonville,Florida,EverBank Field,67246,Hybrid,Tifway 419 Bermuda Grass,Open,2015
+KAN,Kansas City Chiefs,Kansas City,Missouri,Arrowhead Stadium,76416,Hybrid,Latitude 36 Bermuda Grass,Open,2015
+MIA,Miami Dolphins,Miami Gardens,Florida,Sun Life Stadium,65000,Turf,Prescription Athletic Turf (Tifway 419 Bermuda Grass),Open,2015
+MIN,Minnesota Vikings,Minneapolis,Minnesota,TCF Bank Stadium,52525,Turf,FieldTurf Revolution,Open,2015
+NWE,New England Patriots,Foxborough,Massachusetts,Gillette Stadium,68756,Turf,FieldTurf Revolution,Open,2015
+NOR,New Orleans Saints,New Orleans,Louisiana,Mercedes-Benz Superdome,73000,Turf,UBU Speed Series S5-M Synthetic Turf,Domed,2015
+NYG,New York Giants,East Rutherford,New Jersey,MetLife Stadium,82500,Turf,UBU Speed Series S5-M Synthetic Turf,Open,2015
+NYJ,New York Jets,East Rutherford,New Jersey,MetLife Stadium,82500,Turf,UBU Speed Series S5-M Synthetic Turf,Open,2015
+OAK,Oakland Raiders,Oakland,California,O.co Coliseum,56057,Hybrid,Tifway II Bermuda Grass,Open,2015
+PHI,Philadelphia Eagles,Philadelphia,Pennsylvania,Lincoln Financial Field,69596,Hybrid,Desso GrassMaster,Open,2015
+PIT,Pittsburgh Steelers,Pittsburgh,Pennsylvania,Heinz Field,68400,Grass,Kentucky Bluegrass,Open,2015
+SDG,San Diego Chargers,San Diego,California,Qualcomm Stadium,70561,Hybrid,Bandera Bermuda Grass,Open,2015
+SFO,San Francisco 49ers,Santa Clara,California,Levi's Stadium,68500,Hybrid,Tifway II Bermuda Grass / Perennial Ryegrass mixture,Open,2015
+SEA,Seattle Seahawks,Seattle,Washington,CenturyLink Field,67000,Turf,FieldTurf Revolution,Open,2015
+STL,St. Louis Rams,St. Louis,Missouri,Edward Jones Dome,66000,Turf,AstroTurf GameDay Grass 3D,Domed,2015
+TAM,Tampa Bay Buccaneers,Tampa,Florida,Raymond James Stadium,65890,Hybrid,Tifway 419 Bermuda Grass,Open,2015
+TEN,Tennessee Titans,Nashville,Tennessee,Nissan Stadium,69149,Hybrid,TifSport Bermuda Grass,Open,2015
+WAS,Washington Redskins,Landover,Maryland,FedEx Field,73000,Hybrid,Latitude 36 Bermuda Grass,Open,2015
