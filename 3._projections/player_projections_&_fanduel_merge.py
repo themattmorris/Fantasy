@@ -10,8 +10,8 @@ output_path = "/Users/brett/GitHub/proj-fantasy/data/player_pool.csv"
 '''
 grab projections columns and id column from projection csv and merge with player list from FanDuel league
 '''
-fields1 = ['Name', 'Id', 'Projection',]
-fields2 = ['Id', 'Position', 'FPPG', 'Salary', 'Team', 'Opponent', 'Injury Indicator']
+fields1 = ['ID', 'Name', 'Mean',]
+fields2 = ['ID', 'Position', 'FPPG', 'Salary', 'Team', 'Opponent', 'Injury Indicator']
 
 '''
 import two csvs
@@ -28,7 +28,7 @@ merge datasets
 '''
 merged = df1.merge(df2, on="Id").fillna("")
 merged = merged.drop('Id', 1)
-merged.columns = ['name', 'projection',	'position', 'fppg', 'salary', 'team', 'opponent', 'injury']
+merged.columns = ['name', 'projection', 'position', 'fppg', 'salary', 'team', 'opponent', 'injury']
 
 '''
 remove injury risks
