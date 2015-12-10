@@ -1,10 +1,11 @@
 import pandas as pd
 import io
 import requests
-from optparse import OptionParser
-from itertools import groupby
-from openopt import *
-from FuncDesigner import *
+
+'''
+IMPORTANT: specify final output path here
+'''
+output_path = "/Users/brett/GitHub/proj-fantasy/data/player_pool.csv"
 
 '''
 grab projections columns and id column from projection csv and merge with player list from FanDuel league
@@ -15,8 +16,8 @@ fields2 = ['Id', 'Position', 'FPPG', 'Salary', 'Team', 'Opponent', 'Injury Indic
 '''
 import two csvs
 '''
-url1 = "https://raw.githubusercontent.com/brttstl/proj-fantasy/master/final/week_13_projections.csv"
-url2 = "https://raw.githubusercontent.com/brttstl/proj-fantasy/master/final/FanDuel-NFL-2015-12-13-13913-players-list.csv"
+url1 = "https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/week_13_projections.csv"
+url2 = "https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/FanDuel-NFL-2015-12-13-13913-players-list.csv"
 projs = requests.get(url1).content
 plyrs = requests.get(url2).content
 df1 = pd.read_csv(io.StringIO(projs.decode('utf-8')), usecols=fields1)
@@ -43,4 +44,4 @@ players = healthy[['name', 'projection', 'position', 'salary', 'team']]
 '''
 write to csv for sake keeping
 '''
-players.to_csv("/Users/brett/GitHub/proj-fantasy/final/player_pool.csv", index=False)
+players.to_csv(output_path, index=False)
