@@ -26,8 +26,8 @@ df2 = pd.read_csv(io.StringIO(plyrs.decode('utf-8')), usecols=fields2)
 '''
 merge datasets
 '''
-merged = df1.merge(df2, on="Id").fillna("")
-merged = merged.drop('Id', 1)
+merged = df1.merge(df2, on="ID").fillna("")
+merged = merged.drop('ID', 1)
 merged.columns = ['name', 'projection', 'position', 'fppg', 'salary', 'team', 'opponent', 'injury']
 
 '''
