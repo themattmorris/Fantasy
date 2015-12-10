@@ -1,6 +1,5 @@
-library(random)
 library(Rglpk)
-library(data.table)
+library(dplyr)
 
 players <- read.csv("/Users/brett/GitHub/proj-fantasy/final/player_pool.csv", header = TRUE, ",", skipNul = FALSE, stringsAsFactors = FALSE)
 num.x <- length(players$position)
@@ -41,7 +40,4 @@ sol <- Rglpk_solve_LP(obj = obj, mat = matrix, dir = direction, rhs = rhs,
                       types = var.types, max = TRUE)
 
 optimal <- players[sol$solution==1,]
-
-optimal
-sum(optimal$projection)
-sum(optimal$salary)
+write.csv(optimal,"/Users/brett/GitHub/proj-fantasy/final/optimized.csv")
