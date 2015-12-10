@@ -1,9 +1,13 @@
-#### housekeeping ####
+#### load packages ####
 packages <- c('rvest', 'knitr', 'pipeR', 'MASS')
 lapply(packages, library, character.only = T)
 
-#### create list of season 2015 results ####
-fd.sites <- c("http://rotoguru1.com/cgi-bin/fyday.pl?week=12&game=fd&scsv=1",
+#### IMPORTANT: specify final output path here ####
+output.path = "/Users/brett/GitHub/proj-fantasy/data/salary.csv"
+
+#### create list of season 2015 results through week 13 ####
+fd.sites <- c("http://rotoguru1.com/cgi-bin/fyday.pl?week=13&game=fd&scsv=1",
+            "http://rotoguru1.com/cgi-bin/fyday.pl?week=12&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=11&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=10&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=9&game=fd&scsv=1",
@@ -16,10 +20,10 @@ fd.sites <- c("http://rotoguru1.com/cgi-bin/fyday.pl?week=12&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=2&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=1&game=fd&scsv=1")
 
-d <- matrix(nrow = 12, ncol = 1)
+d <- matrix(nrow = 13, ncol = 1)
 
 #### for loop to scrape results and output a csv ####
-for (i in 1:12) {
+for (i in 1:13) {
   ## loop through pages above
   roto <- fd.sites[i]
   urls <- read_html(roto)
@@ -30,5 +34,5 @@ for (i in 1:12) {
       html_text()
   })
   ## save raw data for archival
-  write(d, file = "/Users/brett/GitHub/proj-fantasy/data/salary.csv", sep = ";")
+  write(d, output.path, sep = ";")
 }
