@@ -16,7 +16,7 @@ fields2 = ['Id', 'Position', 'FPPG', 'Salary', 'Team', 'Opponent', 'Injury Indic
 '''
 import two csvs
 '''
-url1 = "https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/week_13_projections.csv"
+url1 = "https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/week_14_projections.csv"
 url2 = "https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/FanDuel-NFL-2015-12-13-13913-players-list.csv"
 projs = requests.get(url1).content
 plyrs = requests.get(url2).content
