@@ -5,23 +5,104 @@
 import numpy as np
 import pandas as pd
 import math
+import requests
+import re
+import io
 import matplotlib.pyplot as plt
 from sklearn import metrics, linear_model, svm, ensemble
 from sklearn.feature_extraction import DictVectorizer
+from collections import defaultdict
+from BeautifulSoup import BeautifulSoup
 
 ### ========================================================= ###
 ###                  INITIALIZE VARIABLES                     ### 
 ### ========================================================= ###
 
+curWeek = 14 # week to create projections for
+year = 2015
+filename ='Week' + str(curWeek) + '_projections.csv'
+filepath = 'C:/Users/Matt/Desktop/'
+
 salCap = 60000 # dollars
 
+colName = 'Projection' # column name for Fan Duel projections
+
 # Number of players by position in lineup
-QB = 1
-RB = 2
-WR = 3
-TE = 1
-K = 1
-DEF = 1
+pos_count = dict()
+pos_count = {
+'QB':1,
+'RB':2,
+'WR':3,
+'TE':1,
+'K':1,
+'DEF':1}
+
+# Both sides of the ball
+sides = list()
+sides = ('offense', 'defense')
+
+# Variables for web scraping
+tags = list()
+
+stats = list()
+stats = (
+'passing',
+'rushing',
+'receiving',
+'returning')
+
+stats2 = (
+'Passing',
+'Rushing',
+'Receiving',
+'Returning')
+statsDict = dict()
+
+statsDict = {
+'passing':'Passing',
+'rushing':'Rushing',
+'receiving':'Receiving',
+'returning':'Returning',
+'NA':'Total'}
+
+teams = dict()
+teams = {
+'Baltimore':'BAL',
+'Cincinnati':'CIN',
+'Cleveland':'CLE',
+'Pittsburgh':'PIT',
+'Houston':'HOU',
+'Indianapolis':'IND',
+'Jacksonville':'JAX',
+'Tennessee':'TEN',
+'Buffalo':'BUF',
+'Miami':'MIA',
+'New England':'NWE',
+'NY Jets':'NYJ',
+'Denver':'DEN',
+'Kansas City':'KAN',
+'Oakland':'OAK',
+'San Diego':'SDG',
+'Chicago':'CHI',
+'Detroit':'DET',
+'Green Bay':'GNB',
+'Minnesota':'MIN',
+'Atlanta':'ATL',
+'Carolina':'CAR',
+'New Orleans':'NOR',
+'Tampa Bay':'TAM',
+'Dallas':'DAL',
+'NY Giants':'NYG',
+'Philadelphia':'PHI',
+'Washington':'WAS',
+'Arizona':'ARI',
+'San Francisco':'SFO',
+'Seattle':'SEA',
+'St. Louis':'STL'}
+
+# Dataframes
+off_result = pd.DataFrame
+def_result = pd.DataFrame
 
 ### ========================================================= ###
 ###                      FUNCTIONS                            ### 
@@ -39,50 +120,325 @@ def CleanData(position, df, df_features, df_compare_features):
     # This is done so that the model data, training set, and test set all have the same predictors.
 
     lst = list()
-    count = -1
 
     # Intialize boolean array length of input array to be hit against input array to pull only True values out
     mask = np.ones(len(df_features[position]), dtype = bool)
-    for feature in df_features[position]:
-        count += 1
+    for i, feature in enumerate(df_features[position]):
         if feature not in df_compare_features[position]:
-            mask[count] = False
+            mask[i] = False
             
-    player_count = 0
-    while player_count < len(df[position]):
-        lst.append(df[position][player_count][mask])
-        player_count += 1
+    for i, player in enumerate(df[position]):
+        lst.append(df[position][i][mask])
         
     return np.asarray(lst)
+    
+
+def ReformatDataFrame(year, dataframe, flag, stat, side):
+
+    global off_result
+    global def_result
+    global statsDict
+
+    # Append season to data
+    x = np.repeat(year, 32, axis = 0)
+    season = list(x)
+    season[0] = 'SEASON'
+    season.append(year)
+    df2 = pd.DataFrame(season)
+    df3 = pd.concat([dataframe, df2], axis = 1, ignore_index = True)
+    
+    # Rename colums
+    col = list()
+    for c in df3.columns:
+        if (df3[c][0] <> 'TEAM') and (df3[c][0] <> 'SEASON'):
+            col.append(str(statsDict[stat]) + '_' + str(df3[c][0]))
+        else:
+            col.append(df3[c][0])
+    df3.columns = col
+    
+    # Drop old header row in data
+    df3 = df3.ix[1:]
+    
+    # Create resultant dataframe.
+    if side == 'offense':
+        if flag == 1:
+            off_result = df3
+        elif flag == 2:
+            # Join to result dataset
+            off_result = pd.merge(off_result, df3, on = ['TEAM', 'SEASON'])
+    elif side == 'defense':
+        if flag == 1:
+            def_result = df3
+        elif flag == 2:
+            # Join to result dataset
+            def_result = pd.merge(def_result, df3, on = ['TEAM', 'SEASON'])
+
+    return
+
+
+def FindStat(url):
+    
+    global stats
+
+    for stat in stats:
+        if url.find(stat) > -1:
+            y = stat
+            break
+        else:
+            y = 'NA'
+            
+    return y
+
+
+def WebScrape(url, side):
+
+    global stats
+    global year
+
+    tags = list()
+    tags.append(url)
+    response = requests.get(url)
+    data = response.text
+    soup = BeautifulSoup(data)
+
+    # Find all the different stats sections in the data
+    for stat in stats:
+        if side == 'offense':
+            tags.append(soup.findAll(href = re.compile('http://espn.go.com/nfl/statistics/team/_/stat/' + str(stat))))
+        elif side == 'defense':
+            tags.append(soup.findAll(href = re.compile('http://espn.go.com/nfl/statistics/team/_/stat/' + str(stat) + '/position/defense')))
+            
+            # Go through each url
+    for url in tags:
+        url = str(url)
+        url = url.replace('[<a href="', '')
+        url = url.replace('</a>]', '')
+        for stat in stats2:
+            url = url.replace('">' + str(stat), '')
+        response = requests.get(url)
+        data = response.text
+        soup = BeautifulSoup(data)
+
+        # Pull HTML table into Python
+        table = str(soup.find("table", attrs = {"class":"tablehead"}))
+            
+        # Create dataframe using HTML table
+        df = pd.read_html(table)
+    
+        # Change team field to be abbreviation to be used for joining to other tables
+        # Start position is the row starting number.  Some tables have multiple header rows.
+        if url.find('returning') > -1:
+            df[0] = df[0].ix[1:]
+            df[0] = df[0].reset_index(drop = True)
+        
+        row = 1
+        for team in df[0][1][1:]:
+            df[0][1][row] = teams[team]
+            row += 1
+        
+        # Fix rank values that are null
+        row = 1
+        for rank in df[0][0][1:]:
+            if math.isnan(float(df[0][0][row])):
+                df[0][0][row] = df[0][0][row - 1]
+            row += 1
+        
+        # Prepare data frame to be written to CSV
+        # If it is the first stats page (total offense statistics)
+        if side == 'offense':
+            if url == 'http://espn.go.com/nfl/statistics/team/_/stat/total':
+                ReformatDataFrame(year, df[0], 1, FindStat(url), side) 
+            # Other statistics
+            else:
+                ReformatDataFrame(year, df[0], 2, FindStat(url), side)
+        elif side == 'defense':
+            if url == 'http://espn.go.com/nfl/statistics/team/_/stat/total/position/defense':
+                ReformatDataFrame(year, df[0], 1, FindStat(url), side)
+            # Other statistics
+            else:
+                ReformatDataFrame(year, df[0], 2, FindStat(url), side)
+
+    return
+
+### ========================================================= ###
+###                     SCRAPE FOR DATA                       ### 
+### ========================================================= ###
+
+# Get stats for opposing team offense (in the case of fantasy defense) and opposing team defense
+# (in the case of fantasy offensive position player
+for side in sides:
+    if side == 'offense':
+        url = 'http://espn.go.com/nfl/statistics/team/_/stat/total'
+    elif side == 'defense':
+        url = 'http://espn.go.com/nfl/statistics/team/_/stat/total/position/defense'
+    WebScrape(url, side)
 
 ### ========================================================= ###
 ###                     PREPARE DATA                          ### 
 ### ========================================================= ###
 
 # Go through both offense and defense
-sides = list()
-sides = ('offense', 'defense')
+outdf = dict((side, None) for side in sides)
 
 for side in sides:
 
     # Read in historical csv file
-    df = pd.read_csv('C:/Users/Matt/Documents/Documents/College Crap/Indiana University/Final Project/proj-fantasy/historical_' + str(side) + '_data.txt')
+    if side == 'offense':
+        df = def_result
+    elif side == 'defense':
+        df = off_result
+        
+    # Drop unnecessary columns
+    columns = list()
+    if side == 'offense':
+        columns = (
+                'SEASON',
+                'Total_PTS',
+                'Total_YDS',
+                'Total_YDS/G',
+                'Total_PASS',
+                'Total_RUSH',
+                'Passing_ATT',
+                'Passing_COMP',
+                'Passing_YDS',
+                'Passing_YDS/A',
+                'Passing_LONG',
+                'Passing_SACK',
+                'Passing_YDSL',
+                'Rushing_ATT',
+                'Rushing_YDS',
+                'Rushing_LONG',
+                'Rushing_FUM',
+                'Receiving_YDS',
+                'Receiving_AVG',
+                'Receiving_LONG',
+                'Receiving_FUM',
+                'Returning_RK',
+                'Returning_YDS',
+                'Returning_ATT',
+                'Returning_AVG',
+                'Returning_LNG',
+                'Returning_TD',
+                'Returning_FC')
+    elif side == 'defense':
+        columns = (
+                'SEASON',
+                'Total_PTS',
+                'Total_YDS',
+                'Total_PASS',
+                'Total_RUSH',
+                'Passing_ATT',
+                'Passing_COMP',
+                'Passing_YDS',
+                'Passing_YDS/A',
+                'Passing_LONG',
+                'Passing_TD',
+                'Passing_YDSL',
+                'Rushing_ATT',
+                'Rushing_YDS',
+                'Rushing_YDS/A',
+                'Rushing_LONG',
+                'Rushing_TD',
+                'Rushing_FUM',
+                'Receiving_YDS',
+                'Receiving_AVG',
+                'Receiving_LONG',
+                'Receiving_FUM',
+                'Returning_RK',
+                'Returning_YDS',
+                'Returning_AVG',
+                'Returning_LNG',
+                'Returning_TD',
+                'Returning_ATT',
+                'Returning_FC')
+        
+    for column in columns:
+        df = df.drop(column, axis = 1)
     
+    # Read in current week players with predictor variables included to run through models
+    weekdf = requests.get('https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/FanDuel-NFL-2015-12-13-13913-players-list.csv').content
+    weekdf = pd.read_csv(io.StringIO(weekdf.decode('utf-8')))
+
+    # Drop unnecessary columns
+    columns = list()
+    columns = (
+            'Played',
+            'First Name',
+            'Last Name',
+            'Id',
+            'Game',
+            'Opponent',
+            'Team',
+            'Injury Details',
+            'Salary',
+            'h/a',
+            'Location')
+    for column in columns:
+        weekdf = weekdf.drop(column, axis = 1)
+
+    # Read in fan duel season data into model
+    seasondf = requests.get('https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/fanduel_season_data.csv').content
+    seasondf = pd.read_csv(io.StringIO(seasondf.decode('utf-8')))
+
+    # Drop unnecessary columns
+    columns = list()
+    columns = (
+            'GID',
+            'Year',
+            'Week',
+            'Pos')
+    for column in columns:
+        seasondf = seasondf.drop(column, axis = 1)
+    
+    # Read in current stadium data csv and merge it to the other datasets
+    stadiums = requests.get('https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/stadiums.csv').content
+    stadiums = pd.read_csv(io.StringIO(stadiums.decode('utf-8')))
+    
+    # Drop unnecessary columns
+    columns = list()
+    columns = (
+            'season',
+            'stadium_name',
+            'city',
+            'state',
+            'team',
+            'capacity',
+            'surface_description')
+    for column in columns:
+        stadiums = stadiums.drop(column, axis = 1)
+
+    # Merge datasets to create one dataset
+    df = pd.merge(left = df, right = seasondf, left_on = 'TEAM', right_on = 'Oppt')
+    df = pd.merge(left = df, right = weekdf, left_on = 'Name', right_on = 'Name')
+    df = pd.merge(left = df, right = stadiums, left_on = 'Location', right_on = 'location')
+    
+    # Remove players that aren't playing and remove unnecessary columns
+    df = df[(df['Injury Indicator'] != 'O') & (df['Injury Indicator'] != 'IR')]
+    df = df[df['Starter'] == 'Y']
+    if side == 'offense':
+        df = df[df['Position'] <> 'DEF']
+    elif side == 'defense':
+        df = df[df['Position'] == 'DEF']
+    columns = list()
+    columns = (
+            'TEAM',
+            'Starter',
+            'Total_P YDS/G',
+            'Total_R YDS/G',
+            'Receiving_YDS/G',
+            'Injury Indicator',
+            'Location')
+    for column in columns:
+        df = df.drop(column, axis = 1)
+
+    # Sort columns in order
+    df = df.reindex_axis(sorted(df.columns), axis = 1)
+
     # Position data dictionary
     positions = list()
     positions = set(df['Position'])
-    
-    model_data = dict((position, 0) for position in positions)
-    
-    maxWeek = max(set(df['Week']))
-    curWeek = maxWeek + 1
-    
-    # Read in current week players with predictor variables included to run through models
-    weekdf = pd.read_csv('C:/Users/Matt/Documents/Documents/College Crap/Indiana University/Final Project/proj-fantasy/Week' + str(curWeek) + '_' + str(side) + '_query.txt')
-    
-    # Position data dictionary
-    df1 = dict((position, 0) for position in positions)
-    
+
+    df1 = dict((position, 0) for position in positions)    
     df2 = dict((position, 0) for position in positions)
     
     # Player count dictionary
@@ -97,6 +453,9 @@ for side in sides:
     test2 = dict((position, []) for position in positions)
     test_target = dict((position, None) for position in positions)
     test_features = dict((position, None) for position in positions)
+    all_data = dict((position, None) for position in positions)
+    all_features = dict((position, None) for position in positions)
+    all_data_target = dict((position, None) for position in positions)
     
     # Model dictionaries
     model_data = dict((position, None) for position in positions)
@@ -117,6 +476,77 @@ for side in sides:
     
     # Output dictionary
     output_data = dict((position, None) for position in positions)
+
+    if side == 'offense':
+        df4 = def_result
+    elif side == 'defense':
+        df4 = off_result
+
+    # Read in current week players with predictor variables included to run through models
+    weekdf = requests.get('https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/FanDuel-NFL-2015-12-13-13913-players-list.csv').content
+    weekdf = pd.read_csv(io.StringIO(weekdf.decode('utf-8')))
+
+    weekdf = pd.merge(left = df4, right = weekdf, left_on = 'TEAM', right_on = 'Opponent')
+    weekdf = pd.merge(left = weekdf, right = stadiums, left_on = 'Location', right_on = 'location')
+    
+    # Remove players that aren't playing and remove unnecessary columns
+    weekdf = weekdf[(weekdf['Injury Indicator'] != 'O') & (weekdf['Injury Indicator'] != 'IR')]
+    weekdf = weekdf[weekdf['Starter'] == 'Y']
+    if side == 'offense':
+        weekdf = weekdf[weekdf['Position'] <> 'DEF']
+    elif side == 'defense':
+        weekdf[weekdf['Position'] == 'DEF']
+    columns = list()
+    columns = (
+            'Id',
+            'TEAM',
+            'Starter',
+            'Total_P YDS/G',
+            'Total_YDS/G',
+            'Total_R YDS/G',
+            'Receiving_YDS/G',
+            'Injury Details',
+            'Injury Indicator',
+            'First Name',
+            'Last Name',
+            'Played',
+            'Game',
+            'Opponent',
+            'Location',
+            'SEASON',
+            'Total_PTS',
+            'Total_YDS',
+            'Total_YDS/G',
+            'Total_PASS',
+            'Total_RUSH',
+            'Passing_ATT',
+            'Passing_COMP',
+            'Passing_YDS',
+            'Passing_YDS/A',
+            'Passing_LONG',
+            'Passing_YDSL',
+            'Rushing_ATT',
+            'Rushing_YDS',
+            'Rushing_YDS/A',
+            'Total_YDS/G',
+            'Rushing_LONG',
+            'Rushing_FUM',
+            'Receiving_YDS',
+            'Receiving_AVG',
+            'Receiving_LONG',
+            'Receiving_FUM',
+            'Returning_RK',
+            'Returning_YDS',
+            'Returning_AVG',
+            'Returning_LNG',
+            'Returning_TD',
+            'Returning_ATT',
+            'Returning_FC')
+    for column in columns:
+        weekdf = weekdf.drop(column, axis = 1)
+
+    # Sort columns in order
+    weekdf = weekdf.reindex_axis(sorted(weekdf.columns), axis = 1)
     
     # Create a different model for each position in data
     for position in positions:
@@ -133,23 +563,29 @@ for side in sides:
                 df2[player] = df1[position][df1[position]['Name'] == player]
                 try:
                     train[position] = train[position].append(TrainingSet(math.floor(playerCount[player]*0.7), df2[player]))
+                    all_data[position] = all_data[position].append(TrainingSet(playerCount[player], df2[player]))
+                    all_data_target[position] = all_data_target[position].append(df2[player]['FD points'])
                 except:
                     train[position] = TrainingSet(math.floor(playerCount[player]*0.7), df2[player])
+                    all_data[position] = TrainingSet(playerCount[player], df2[player])
+                    all_data_target[position] = df2[player]['FD points']
             
                 # Find indices not in training set that should be included in test set
                 for index in df2[player].index:
                     if index not in train[position].index:
                         try:
                             test[position] = test[position].append(df2[player].loc[[index]])
-                            test_target[position] = test_target[position].append(df2[player].loc[[index]]['FanDuelpts'])
+                            test_target[position] = test_target[position].append(df2[player].loc[[index]]['FD points'])
                         except:
                             test[position] = df2[player].loc[[index]]
-                            test_target[position] = df2[player].loc[[index]]['FanDuelpts']
+                            test_target[position] = df2[player].loc[[index]]['FD points']
                     else:
                         try:
-                            train_target[position] = train_target[position].append(df2[player].loc[[index]]['FanDuelpts'])
+                            train_target[position] = train_target[position].append(df2[player].loc[[index]]['FD points'])
                         except:
-                            train_target[position] = df2[player].loc[[index]]['FanDuelpts']
+                            train_target[position] = df2[player].loc[[index]]['FD points']
+            else:
+                all_data[position] = all_data[position][all_data[position]['Name'] <> player]
     
         # Convert data frame vectors to lists to pass into models
         train_target[position] = train_target[position].values.T.tolist()
@@ -159,26 +595,101 @@ for side in sides:
         columns = list()
         if position == 'QB':
             # Include passing and rushing metrics
-            columns = ('Position', 'Opponent', 'First Name', 'Last Name', 'cmp', 'pass_att', 'pass_yd', 'pass_td', 'int_thrown', 'rush_att', 'rush_yd', 'rush_td', 'targets', 'receptions', 'rec_yd', 'rec_td', 'fumbles_lost', 'kick_ret_td', 'punt_ret_td', 'xpm', 'xpa', 'fgm', 'fga', 'off_snap_count', 'def_snap_count', 'st_snap_count', 'qbr', 'traditional_fantasy_points', 'two_pt_conv', 'FanDuelpts', 'Receiving_RK', 'Receiving_REC', 'Receiving_AVG', 'Receiving_TD', 'Receiving_FUML', 'Kickoff_Return_AVG', 'Kickoff_Return_TD', 'Punt_Return_AVG', 'Punt_Return_TD', 'Week')
+            columns = (
+                    'Position',
+                    'Oppt',
+                    'FD points',
+                    'Receiving_RK',
+                    'Receiving_REC',
+                    'Receiving_TD',
+                    'Receiving_FUML',
+                    'Passing_SACK')
         elif position == 'RB':
-            # Include rushing, receiving, and return metrics
-            columns = ('Position', 'Opponent', 'First Name', 'Last Name', 'cmp', 'pass_att', 'pass_yd', 'pass_td', 'int_thrown', 'rush_att', 'rush_yd', 'rush_td', 'targets', 'receptions', 'rec_yd', 'rec_td', 'fumbles_lost', 'kick_ret_td', 'punt_ret_td', 'xpm', 'xpa', 'fgm', 'fga', 'off_snap_count', 'def_snap_count', 'st_snap_count', 'qbr', 'traditional_fantasy_points', 'two_pt_conv', 'FanDuelpts', 'Passing_RK', 'Passing_PCT', 'Passing_YDS/A', 'Passing_TD', 'Passing_INT', 'Passing_RATE', 'Week')
+            # Include rushing and receiving metrics
+            columns = (
+                    'Position',
+                    'Oppt',
+                    'FD points',
+                    'Passing_RK',
+                    'Passing_PCT',
+                    'Passing_TD',
+                    'Passing_INT',
+                    'Passing_RATE',
+                    'Passing_SACK')
         elif (position == 'WR') or (position == 'TE'):
-            # Include receiving and return metrics
-            columns = ('Position', 'Opponent', 'First Name', 'Last Name', 'cmp', 'pass_att', 'pass_yd', 'pass_td', 'int_thrown', 'rush_att', 'rush_yd', 'rush_td', 'targets', 'receptions', 'rec_yd', 'rec_td', 'fumbles_lost', 'kick_ret_td', 'punt_ret_td', 'xpm', 'xpa', 'fgm', 'fga', 'off_snap_count', 'def_snap_count', 'st_snap_count', 'qbr', 'traditional_fantasy_points', 'two_pt_conv', 'FanDuelpts', 'Total_R YDS/G', 'Passing_RK', 'Passing_PCT', 'Passing_YDS/A', 'Passing_TD', 'Passing_INT', 'Passing_RATE', 'Rushing_RK', 'Rushing_ATT', 'Rushing_YDS/A', 'Rushing_TD', 'Rushing_FUML', 'Week')
+            # Include only receiving metrics
+            columns = (
+                    'Position',
+                    'Oppt',
+                    'FD points',
+                    'Passing_RK',
+                    'Passing_PCT',
+                    'Passing_TD',
+                    'Passing_INT',
+                    'Passing_RATE',
+                    'Rushing_RK',
+                    'Rushing_YDS/A',
+                    'Rushing_TD',
+                    'Rushing_YDS/G',
+                    'Rushing_FUML',
+                    'Passing_SACK')
         elif position == 'K':
             # Return only kicking metrics
-            columns = ('Position', 'Opponent', 'First Name', 'Last Name', 'cmp', 'pass_att', 'pass_yd', 'pass_td', 'int_thrown', 'rush_att', 'rush_yd', 'rush_td', 'targets', 'receptions', 'rec_yd', 'rec_td', 'fumbles_lost', 'kick_ret_td', 'punt_ret_td', 'xpm', 'xpa', 'fgm', 'fga', 'off_snap_count', 'def_snap_count', 'st_snap_count', 'qbr', 'traditional_fantasy_points', 'two_pt_conv', 'FanDuelpts', 'Total_P YDS/G', 'Total_R YDS/G', 'Passing_RK', 'Passing_PCT', 'Passing_YDS/A', 'Passing_TD', 'Passing_INT', 'Passing_RATE',  'Rushing_RK', 'Rushing_ATT', 'Rushing_YDS/A', 'Rushing_TD', 'Rushing_FUML', 'Receiving_RK', 'Receiving_REC', 'Receiving_AVG', 'Receiving_TD', 'Receiving_FUML', 'Kickoff_Return_AVG', 'Kickoff_Return_TD', 'Punt_Return_AVG', 'Punt_Return_TD', 'Week')
+            columns = (
+                    'Position',
+                    'Oppt',
+                    'FD points',
+                    'Passing_RK',
+                    'Passing_PCT',
+                    'Passing_TD',
+                    'Passing_INT',
+                    'Passing_RATE',
+                    'Passing_YDS/G',
+                    'Rushing_RK',
+                    'Rushing_YDS/A',
+                    'Rushing_TD',
+                    'Rushing_YDS/G',
+                    'Rushing_FUML',
+                    'Receiving_RK',
+                    'Receiving_REC',
+                    'Receiving_TD',
+                    'Receiving_FUML',
+                    'Passing_SACK')
         elif position == 'DEF':
-            columns = ('Position', 'opponent', 'First Name', 'Last Name', 'Week', 'FanDuelpts')
+            # Include relevant metrics from opposing offense
+            columns = (
+                    'Position',
+                    'Oppt',
+                    'FD points',
+                    'Receiving_TD',
+                    'Passing_TD',
+                    'Rushing_TD',
+                    'Rushing_YDS/G',
+                    'Passing_YDS/G',
+                    'Total_YDS/G',
+                    'Rushing_YDS/G',
+                    'Passing_YDS/G',
+                    'Receiving_REC',
+                    'Receiving_RK',
+                    'Rushing_RK',
+                    'Passing_RK')
     
+        # Drop columns
         for column in columns:
-            train[position] = train[position].drop(column, axis = 1)
-            test[position] = test[position].drop(column, axis = 1)
             try:
-                # All columns that are being dropped in train and test should be dropped in the current week dataframe to be ran through the model.
-                # However, this dataframe has fewer columns than the train and test sets, so attempting to drop some will throw an error.
+                train[position] = train[position].drop(column, axis = 1)
+            except:
+                Exception
+            try:
+                test[position] = test[position].drop(column, axis = 1)
+            except:
+                Exception
+            try:
                 model_data[position] = model_data[position].drop(column, axis = 1)
+            except:
+                Exception
+            try:
+                all_data[position] = all_data[position].drop(column, axis = 1)
             except:
                 Exception
             
@@ -199,6 +710,11 @@ for side in sides:
         test[position] = test[position].convert_objects(convert_numeric = True)
         test[position] = dv.fit_transform(test[position].to_dict(orient = 'records'))
         test_features[position] = dv.get_feature_names()
+
+        # Full data set    
+        all_data[position] = all_data[position].convert_objects(convert_numeric = True)
+        all_data[position] = dv.fit_transform(all_data[position].to_dict(orient = 'records'))
+        all_features[position] = dv.get_feature_names()
         
         ### CLEAN THE THREE DIFFERENT DATASETS. ###
     
@@ -206,6 +722,7 @@ for side in sides:
         train[position] = CleanData(position, train, train_features, model_features)
         model_data[position] = CleanData(position, model_data, model_features, train_features)
         test[position] = CleanData(position, test, test_features, model_features)
+        all_data[position] = CleanData(position, all_data, all_features, model_features)
     
     ### ========================================================= ###
     ###                      TRAIN MODELS                         ### 
@@ -259,6 +776,11 @@ for side in sides:
     ### ========================================================= ###
     ###                         RUN MODEL                         ### 
     ### ========================================================= ###
+
+        ### GRADIENT BOOSTED MACHINE ###
+        params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 1, 'learning_rate': 0.01, 'loss': 'ls'}
+        gbm[position] = ensemble.GradientBoostingRegressor(**params)
+        gbm[position].fit(all_data[position], all_data_target[position])
     
         # Use best model to run projection on current week of data
         model_pred[position] = gbm[position].predict(model_data[position])
@@ -269,36 +791,48 @@ for side in sides:
     
         # Set correct indices for model predictions, and convert it to a dataframe
         model_pred[position] = pd.DataFrame(model_pred[position]).set_index(output_data[position].index, append = False)
-        model_pred[position].rename(columns = {0:'Projection'}, inplace = True)
+        model_pred[position].rename(columns = {0:colName}, inplace = True)
         output_data[position] = pd.concat([output_data[position], model_pred[position]], axis = 1)
         
     # Create dataset with positions all in one dataset
-    count = 0
-    for position in output_data:
-        if count == 0:
+    for i, position in enumerate(output_data):
+        if (i == 0) and (side == 'offense'):
             output = output_data[position]
         else:
             output = output.append(output_data[position])
-        count += 1
     
-    # Read in current week players to append projections to
-    outdf = pd.read_csv('C:/Users/Matt/Documents/Documents/College Crap/Indiana University/Final Project/proj-fantasy/FanDuel_2015_Week' + str(curWeek) + '.csv')
-    outdf = outdf.drop('Starter', axis = 1)
-    
-    # Remove all unnecessary columns from dataframe before writing
-    columns = list()
-    columns = ('Name', 'Projection')
-    
-    for col in output.columns:
-        if col not in columns:
-            output = output.drop(col, axis = 1)
-    
-    # Merge dataframes together
-    outdf = pd.merge(output, outdf, on = 'Name')
-    
-    # Write output to csv file
-    if side == 'offense':
-        outdf.to_csv('C:/Users/Matt/Documents/Documents/College Crap/Indiana University/Final Project/proj-fantasy/Week' + str(curWeek) + '_projections.csv', index = False, sep=',', header = True)
-    elif side == 'defense':
-        with open('C:/Users/Matt/Documents/Documents/College Crap/Indiana University/Final Project/proj-fantasy/Week' + str(curWeek) + '_projections.csv', 'a') as f:
-            outdf.to_csv(f, index = False, header = False)
+# Write projections to csv file at end
+output.to_csv(filepath + filename, index = False, sep=',', header = True)
+
+### ========================================================= ###
+###                     OPTIMIZE LINEUP                       ### 
+### ========================================================= ###
+
+# Initially was going to try to optimize in this script, but this is done in another script.
+# The lineup variable below spits out the best lineup, but does not take salary cap into account.
+
+# Position data dictionary
+positions = list()
+positions = set(output['Position'])
+
+# Sort lineup dataframe by highest fantasy points
+output = output.sort([colName], ascending = False)
+output = output.reset_index()
+
+# Lineup dictionary
+lineup = defaultdict(dict)
+
+# Create lineup with best players by projections regardless of salary cap
+for position in positions:
+    plist = list()
+    ptlist = list()
+    slist = list()
+    while len(plist) < pos_count[position]:
+        for index, row in output.iterrows():
+            if (row['Position'] == position) and (row['Name'] not in plist):
+                plist.append(row['Name'])
+                ptlist.append(row[colName])
+                slist.append(row['Salary'])
+                break
+    for i, player in enumerate(plist):
+        lineup[position][player] = {colName: ptlist[i], 'Salary': slist[i]}
