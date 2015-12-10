@@ -1,14 +1,17 @@
 library(Rglpk)
 library(dplyr)
 
-players <- read.csv("/Users/brett/GitHub/proj-fantasy/final/player_pool.csv", header = TRUE, ",", skipNul = FALSE, stringsAsFactors = FALSE)
+#### import output from player_projections_&_fanduel_merge.py ####
+players <- read.csv("https://raw.githubusercontent.com/brttstl/proj-fantasy/master/final/player_pool.csv", header = TRUE, ",", skipNul = FALSE, stringsAsFactors = FALSE)
 num.x <- length(players$position)
 
-# objective:
+#### set objective: ####
 obj <- players$projection
-# the vars are represented as booleans
+
+#### vars are represented as booleans ####
 var.types <- rep("B", num.x)
-# the constraints
+
+#### constraints ####
 matrix <- rbind(as.numeric(players$position == "QB"),
                 as.numeric(players$position == "RB"),
                 as.numeric(players$position == "WR"),
@@ -36,8 +39,10 @@ rhs <- c(1, # QB
          9, # Total
          60000)               
 
+#### solve optimal lineup ####
 sol <- Rglpk_solve_LP(obj = obj, mat = matrix, dir = direction, rhs = rhs,
                       types = var.types, max = TRUE)
 
-optimal <- players[sol$solution==1,]
-write.csv(optimal,"/Users/brett/GitHub/proj-fantasy/final/optimized.csv")
+#### return and write optimal lineup for game ####
+optimal <- tbl_df(players[sol$solution==1,])
+write.csv(optimal,"/Users/brett/GitHub/proj-fantasy/final/optimal.csv")
