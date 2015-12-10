@@ -1,11 +1,15 @@
-library(Rglpk)
-library(dplyr)
+#### load packages and fix functions ####
+data.packages <- c('dplyr', 'Rglpk')
+lapply(data.packages, library, character.only = T)
 
-#### set file path for reporoducibility ####
+#### IMPORTANT: specify final output path here ####
+output.path = "/Users/brett/GitHub/proj-fantasy/5._final_optimized_lineup/optimal_lineup.csv"
+
+#### set file path for reproducibility ####
 mypath = file.path("/Users", "brett", "GitHub", "proj-fantasy", "final")
 
 #### import output from player_projections_&_fanduel_merge.py ####
-players <- read.csv("https://raw.githubusercontent.com/brttstl/proj-fantasy/master/final/player_pool.csv", header = TRUE, ",", skipNul = FALSE, stringsAsFactors = FALSE)
+players <- read.csv("https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/player_pool.csv", header = TRUE, ",", skipNul = FALSE, stringsAsFactors = FALSE)
 num.x <- length(players$position)
 
 #### set objective: ####
@@ -49,4 +53,4 @@ sol <- Rglpk_solve_LP(obj = obj, mat = matrix, dir = direction, rhs = rhs,
 #### return and write optimal lineup for game ####
 optimal <- tbl_df(players[sol$solution==1,])
 
-write.csv(optimal,file.path("/Users", "brett", "GitHub", "proj-fantasy", "final", "optimal.csv"))
+write.csv(optimal, output.path)
