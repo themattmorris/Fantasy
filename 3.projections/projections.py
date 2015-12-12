@@ -870,7 +870,7 @@ for side in sides:
     ### ========================================================= ###
     ###                       WRITE OUTPUT                        ### 
     ### ========================================================= ###
-            
+
             # Set correct indices for model predictions, and convert it to a dataframe
             model_pred[position] = pd.DataFrame(model_pred[position]).set_index(output_data[position].index, append = False)
             model_pred[position].rename(columns = {0:colName + ' ' + str(iteration + 1)}, inplace = True)
@@ -878,18 +878,43 @@ for side in sides:
 
             iteration += 1
 
-    # Add statistical metrics to dataset
-    count = 0
-    while count < len(output_data[position]):
-        mean[position].append(np.mean(output_data[position].reset_index().loc[count, colName + ' ' + str(1):colName + ' ' + str(iterations)]))
-        median[position].append(np.median(output_data[position].reset_index().loc[count, colName + ' ' + str(1):colName + ' ' + str(iterations)])        )
-        stdev[position].append(np.std(output_data[position].reset_index().loc[count, colName + ' ' + str(1):colName + ' ' + str(iterations)])        )
-        count += 1
-        
-    mean[position] = pd.DataFrame({'Mean':mean[position]}).set_index(output_data[position].index, append = False)
-    median[position] = pd.DataFrame({'Median':median[position]}).set_index(output_data[position].index, append = False)
-    stdev[position] = pd.DataFrame({'Standard Deviation':stdev[position]}).set_index(output_data[position].index, append = False)    
-    output_data[position] = pd.concat([output_data[position], mean[position], median[position], stdev[position]], axis = 1)
+        # Add statistical metrics to dataset
+        count = 0
+        while count < len(output_data[position]):
+            mean[position].append(np.mean(output_data[position].reset_index().loc[count, colName + ' ' + str(1):colName + ' ' + str(iterations)]))
+            median[position].append(np.median(output_data[position].reset_index().loc[count, colName + ' ' + str(1):colName + ' ' + str(iterations)])        )
+            stdev[position].append(np.std(output_data[position].reset_index().loc[count, colName + ' ' + str(1):colName + ' ' + str(iterations)])        )
+            count += 1
+            
+        mean[position] = pd.DataFrame({'Mean':mean[position]}).set_index(output_data[position].index, append = False)
+        median[position] = pd.DataFrame({'Median':median[position]}).set_index(output_data[position].index, append = False)
+        stdev[position] = pd.DataFrame({'Standard Deviation':stdev[position]}).set_index(output_data[position].index, append = False)    
+        output_data[position] = pd.concat([output_data[position], mean[position], median[position], stdev[position]], axis = 1)
+
+        # Remove unnecessary columns from output data
+        columns = list()
+        columns = (
+                'Passing_INT',
+                'Passing_PCT',
+                'Passing_RATE',
+                'Passing_RK',
+                'Passing_SACK',
+                'Passing_TD',
+                'Passing_YDS/G',
+                'Receiving_FUML',
+                'Receiving_REC',
+                'Receiving_RK',
+                'Receiving_TD',
+                'Rushing_FUML',
+                'Rushing_RK',
+                'Rushing_TD',
+                'Rushing_YDS/G',
+                'Total_PTS/G',
+                'Total_RK')
+                
+        for column in columns:
+            if column in output_data[position]:
+                output_data[position] = output_data[position].drop(column, axis = 1)
             
     # Create dataset with positions all in one dataset
     for i, position in enumerate(output_data):
