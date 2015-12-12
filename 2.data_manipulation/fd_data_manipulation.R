@@ -6,6 +6,7 @@ ipak <- function(pkg){
     install.packages(new.pkg, dependencies = TRUE)
   sapply(pkg, require, character.only = TRUE)
 }
+
 ## packages to install and load
 data.packages <- c('dplyr', 'ggplot2', 'RColorBrewer', 'RCurl', 'ggthemes', 'ggExtra', 'gridExtra', 'scales', 'tidyr', 'MASS', 'devtools', 'lubridate', 'mosaic')
 ipak(data.packages)

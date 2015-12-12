@@ -1,5 +1,15 @@
-#### load packages ####
+#### install & load packages and fix functions ####
+## install package function
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+
+## packages to install and load
 packages <- c('rvest', 'knitr', 'pipeR', 'MASS')
+ipak(packages)
 lapply(packages, library, character.only = T)
 
 #### IMPORTANT: specify final output path here ####
