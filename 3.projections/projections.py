@@ -555,8 +555,6 @@ for side in sides:
             'Last Name',
             'Played',
             'Game',
-            'Opponent',
-            'Location',
             'SEASON',
             'Total_PTS',
             'Total_YDS',
@@ -910,7 +908,11 @@ for side in sides:
                 'Rushing_TD',
                 'Rushing_YDS/G',
                 'Total_PTS/G',
-                'Total_RK')
+                'Total_RK',
+                'h/a',
+                'roof_type',
+                'surface_type',
+                'location')
                 
         for column in columns:
             if column in output_data[position]:
