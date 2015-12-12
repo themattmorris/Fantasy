@@ -1,6 +1,6 @@
 ##Instructions for running the fantasy lineup optimizer
 
-  ## 1.[Open folder 1.scraping](https://github.com/brttstl/proj-fantasy/tree/master/1.scraping)
+  ## 1.Open folder [1.scraping](https://github.com/brttstl/proj-fantasy/tree/master/1.scraping)
   This folder contains scripts that will scrape and compile datasets from fanduel, rotoguru, and profootball-reference.com:
   #### [defense_data.py](https://github.com/brttstl/proj-fantasy/blob/master/1.scraping/defense_data.py)
   #### [fantasy_data.py](https://github.com/brttstl/proj-fantasy/blob/master/1.scraping/fantasy_data.py)
