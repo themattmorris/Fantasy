@@ -16,7 +16,6 @@ import math
 import requests
 import re
 import io
-import matplotlib.pyplot as plt
 from sklearn import metrics, linear_model, svm, ensemble
 from sklearn.feature_extraction import DictVectorizer
 from collections import defaultdict
