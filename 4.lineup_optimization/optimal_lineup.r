@@ -6,7 +6,7 @@ data.packages <- c('dplyr', 'Rglpk')
 lapply(data.packages, library, character.only = T)
 
 #### IMPORTANT: specify final output path here ####
-output.path = "/Users/brett/GitHub/proj-fantasy/5.final_optimized_lineup/optimal_lineup2.csv"
+output.path = "/Users/brett/GitHub/proj-fantasy/5.final_optimized_lineup/optimal_lineup.csv"
 
 #### import output from player_projections_&_fanduel_merge.py ####
 players <- tbl_df(read.csv("https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/player_pool.csv", header = TRUE, ",", skipNul = FALSE, stringsAsFactors = FALSE))
