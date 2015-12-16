@@ -16,7 +16,8 @@ lapply(packages, library, character.only = T)
 output.path = "/Users/brett/GitHub/proj-fantasy/data/salary.csv"
 
 #### create list of season 2015 results through week 13 ####
-fd.sites <- c("http://rotoguru1.com/cgi-bin/fyday.pl?week=13&game=fd&scsv=1",
+fd.sites <- c("http://rotoguru1.com/cgi-bin/fyday.pl?week=14&game=fd&scsv=1",
+            "http://rotoguru1.com/cgi-bin/fyday.pl?week=13&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=12&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=11&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=10&game=fd&scsv=1",
@@ -30,10 +31,10 @@ fd.sites <- c("http://rotoguru1.com/cgi-bin/fyday.pl?week=13&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=2&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=1&game=fd&scsv=1")
 
-d <- matrix(nrow = 13, ncol = 1)
+d <- matrix(nrow = 14, ncol = 1)
 
 #### for loop to scrape results and output a csv ####
-for (i in 1:13) {
+for (i in 1:14) {
   ## loop through pages above
   roto <- fd.sites[i]
   urls <- read_html(roto)
