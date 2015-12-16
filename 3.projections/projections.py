@@ -2,8 +2,9 @@
 ###                        USER INPUTS                        ### 
 ### ========================================================= ###
 
-curWeek = 14 # week to create projections for
+curWeek = 15 # week to create projections for
 year = 2015 # football season
+inputfile = 'https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/FanDuel-NFL-2015-12-20-13996-players-list.csv' # to be read in and create projections from
 filepath = 'C:/Users/Matt/Desktop/' # location of where to write output file
 
 ### ========================================================= ###
@@ -13,9 +14,9 @@ filepath = 'C:/Users/Matt/Desktop/' # location of where to write output file
 import numpy as np
 import pandas as pd
 import math
-import requests
-import re
-import io
+from requests import get
+from re import compile
+from io import StringIO
 from sklearn import metrics, linear_model, svm, ensemble
 from sklearn.feature_extraction import DictVectorizer
 from collections import defaultdict
@@ -31,7 +32,6 @@ filename ='Week' + str(curWeek) + '_projections.csv' # name of file to write out
 iterations = 10 # number of model iterations to run
 
 # Number of players by position in lineup
-pos_count = dict()
 pos_count = {
 'QB':1,
 'RB':2,
@@ -41,25 +41,22 @@ pos_count = {
 'DEF':1}
 
 # Both sides of the ball
-sides = list()
-sides = ('offense', 'defense')
+sides = ['offense', 'defense']
 
 # Variables for web scraping
 tags = list()
 
-stats = list()
-stats = (
+stats = [
 'passing',
 'rushing',
 'receiving',
-'returning')
+'returning']
 
-stats2 = (
+stats2 = [
 'Passing',
 'Rushing',
 'Receiving',
-'Returning')
-statsDict = dict()
+'Returning']
 
 statsDict = {
 'passing':'Passing',
@@ -68,7 +65,6 @@ statsDict = {
 'returning':'Returning',
 'NA':'Total'}
 
-teams = dict()
 teams = {
 'Baltimore':'BAL',
 'Cincinnati':'CIN',
@@ -104,7 +100,6 @@ teams = {
 'St. Louis':'STL'}
 
 # Standardize abbreviations within datasets
-teamabr = dict()
 teamabr = {
 'GB':'GNB',
 'JAC':'JAX',
@@ -215,25 +210,25 @@ def WebScrape(url, side):
 
     tags = list()
     tags.append(url)
-    response = requests.get(url)
+    response = get(url)
     data = response.text
     soup = BeautifulSoup(data)
 
     # Find all the different stats sections in the data
     for stat in stats:
         if side == 'offense':
-            tags.append(soup.findAll(href = re.compile('http://espn.go.com/nfl/statistics/team/_/stat/' + str(stat))))
+            tags.append(soup.findAll(href = compile('http://espn.go.com/nfl/statistics/team/_/stat/' + str(stat))))
         elif side == 'defense':
-            tags.append(soup.findAll(href = re.compile('http://espn.go.com/nfl/statistics/team/_/stat/' + str(stat) + '/position/defense')))
+            tags.append(soup.findAll(href = compile('http://espn.go.com/nfl/statistics/team/_/stat/' + str(stat) + '/position/defense')))
             
-            # Go through each url
+    # Go through each url
     for url in tags:
         url = str(url)
         url = url.replace('[<a href="', '')
         url = url.replace('</a>]', '')
         for stat in stats2:
             url = url.replace('">' + str(stat), '')
-        response = requests.get(url)
+        response = get(url)
         data = response.text
         soup = BeautifulSoup(data)
 
@@ -278,14 +273,84 @@ def WebScrape(url, side):
 
     return
 
+def DepthChart():
+
+    global teamabr
+
+    # Returns latest depth chart from foxsports.com
+    
+    urls = {
+            'QB':'http://www.foxsports.com/fantasy/football/commissioner/Players/DepthCharts.aspx?nflLeague=1&position=8',
+            'RB':'http://www.foxsports.com/fantasy/football/commissioner/Players/DepthCharts.aspx?nflLeague=1&position=16',
+            'FB':'http://www.foxsports.com/fantasy/football/commissioner/Players/DepthCharts.aspx?nflLeague=1&position=67',
+            'WR':'http://www.foxsports.com/fantasy/football/commissioner/Players/DepthCharts.aspx?nflLeague=1&position=1',
+            'TE':'http://www.foxsports.com/fantasy/football/commissioner/Players/DepthCharts.aspx?nflLeague=1&position=4',
+            'K':'http://www.foxsports.com/fantasy/football/commissioner/Players/DepthCharts.aspx?nflLeague=1&position=64'}
+            
+    columns = [
+            'Team',
+            'Starter',
+            'Backup',
+            'Reserves',
+            'WR1',
+            'WR2',
+            'WR3',
+            'Position']
+
+    depth = pd.DataFrame(columns = columns)
+
+    for position in urls:
+        posList = pd.DataFrame([position] * 16 )
+        for x in range(0, 2):
+            response = get(urls[position])
+            data = response.text
+            
+            if x == 0:
+                soup = BeautifulSoup(data)
+            elif x == 1:
+                soup = BeautifulSoup(data[data.find("NFC Teams") - 250:])
+            
+            # Pull HTML table into Python
+            table = str(soup.find("table", attrs = {"class":"wis_standard"}))
+                
+            # Create dataframe using HTML table
+            df = pd.read_html(table)
+            
+            # Drop last column of dataframe (not necessary)
+            df[0] = df[0].drop('Reserves', axis = 1)
+    
+            # Add position column to dataframe
+            df[0] = pd.concat([df[0], posList], axis = 1)
+            
+            # Rename columns
+            if position in ['K', 'FB', 'TE']:
+                df[0].columns = ['Team', 'Starter', 'Reserves', 'Position']
+            elif position == 'WR':
+                df[0].columns = ['Team', 'WR1', 'WR2', 'WR3', 'Reserves', 'Position']
+            else:    
+                df[0].columns = ['Team', 'Starter', 'Backup', 'Reserves', 'Position']
+            
+            # Convert all team values to uppercase
+            df[0]['Team'] = map(str.upper, df[0]['Team'])
+            
+            # Change team names to consistent abbreviations for merging
+            for i, team in enumerate(df[0]['Team']):
+                if team in teamabr:
+                    df[0].loc[i, 'Team'] = teamabr[team]
+    
+            depth = depth.append(df[0])
+        
+    return depth
 
 def CleanWeekDF():
+
+    global teamabr
 
     # Cleans the fan duel current weekly player list (lineup prior to gametime)
     
     # Read in current week players with predictor variables included to run through models
-    weekdf = requests.get('https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/FanDuel-NFL-2015-12-13-13913-players-list.csv').content
-    weekdf = pd.read_csv(io.StringIO(weekdf.decode('utf-8')))
+    weekdf = get(inputfile).content
+    weekdf = pd.read_csv(StringIO(weekdf.decode('utf-8')))
 
     # Get correct team name for looking up
     for i, team in enumerate(weekdf['Team']):
@@ -303,6 +368,10 @@ def CleanWeekDF():
     locations = pd.DataFrame({'Location':x})
     ha = pd.DataFrame({'h/a':x})
     weekdf = pd.concat([weekdf, names, locations, ha], axis = 1, ignore_index = False)
+    
+    # Rename Id column to maintain consistency when outputting (sometimes it reads Id, sometime ID)
+    idstr = [col for col in weekdf.columns if col.upper() == 'ID']
+    weekdf = weekdf.rename(columns = {idstr[0]:'ID'})
 
     # Write columns for name, location, and home/away
     count = 0
@@ -330,6 +399,28 @@ def CleanWeekDF():
         weekdf.loc[count, 'Name'] = name
         count += 1
 
+    # Remove unnecessary columns
+    columns = [
+            'Position',
+            'First Name',
+            'Last Name',
+            'Name',
+            'FPPG',
+            'Played',
+            'Salary',
+            'Game',
+            'Team',
+            'Opponent',
+            'Injury Indicator',
+            'Injury Details',
+            'Location',
+            'h/a',
+            'ID']
+                
+    for column in weekdf.columns:
+        if column not in columns:
+            weekdf = weekdf.drop(column, axis = 1)
+
     return weekdf
 
 
@@ -345,6 +436,9 @@ for side in sides:
     elif side == 'defense':
         url = 'http://espn.go.com/nfl/statistics/team/_/stat/total/position/defense'
     WebScrape(url, side)
+
+# Get current week depth charts
+depth = DepthChart()
 
 ### ========================================================= ###
 ###                     PREPARE DATA                          ### 
@@ -362,9 +456,8 @@ for side in sides:
         df = off_result
         
     # Drop unnecessary columns
-    columns = list()
     if side == 'offense':
-        columns = (
+        columns = [
                 'SEASON',
                 'Total_PTS',
                 'Total_YDS',
@@ -392,9 +485,9 @@ for side in sides:
                 'Returning_AVG',
                 'Returning_LNG',
                 'Returning_TD',
-                'Returning_FC')
+                'Returning_FC']
     elif side == 'defense':
-        columns = (
+        columns = [
                 'SEASON',
                 'Total_PTS',
                 'Total_YDS',
@@ -423,7 +516,7 @@ for side in sides:
                 'Returning_LNG',
                 'Returning_TD',
                 'Returning_ATT',
-                'Returning_FC')
+                'Returning_FC']
         
     for column in columns:
         df = df.drop(column, axis = 1)
@@ -432,50 +525,49 @@ for side in sides:
     weekdf = CleanWeekDF()
 
     # Drop unnecessary columns
-    columns = list()
-    columns = (
+    columns = [
             'Played',
             'Location',
             'h/a',
             'First Name',
             'Last Name',
-            'ID',
             'Game',
             'Opponent',
             'Team',
             'Injury Details',
-            'Salary',)
+            'Salary',]
     for column in columns:
-        weekdf = weekdf.drop(column, axis = 1)
+        try:
+            weekdf = weekdf.drop(column, axis = 1)
+        except:
+            Exception
 
     # Read in fan duel season data into model
-    seasondf = requests.get('https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/fanduel_season_data.csv').content
-    seasondf = pd.read_csv(io.StringIO(seasondf.decode('utf-8')))
+    seasondf = get('https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/fanduel_season_data.csv').content
+    seasondf = pd.read_csv(StringIO(seasondf.decode('utf-8')))
 
     # Drop unnecessary columns
-    columns = list()
-    columns = (
+    columns = [
             'GID',
             'Year',
             'Week',
-            'Pos')
+            'Pos']
     for column in columns:
         seasondf = seasondf.drop(column, axis = 1)
     
     # Read in current stadium data csv and merge it to the other datasets
-    stadiums = requests.get('https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/stadiums.csv').content
-    stadiums = pd.read_csv(io.StringIO(stadiums.decode('utf-8')))
+    stadiums = get('https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/stadiums.csv').content
+    stadiums = pd.read_csv(StringIO(stadiums.decode('utf-8')))
     
     # Drop unnecessary columns
-    columns = list()
-    columns = (
+    columns = [
             'season',
             'stadium_name',
             'city',
             'state',
             'team',
             'capacity',
-            'surface_description')
+            'surface_description']
     for column in columns:
         stadiums = stadiums.drop(column, axis = 1)
 
@@ -491,15 +583,14 @@ for side in sides:
         df = df[df['Position'] <> 'DEF']
     elif side == 'defense':
         df = df[df['Position'] == 'DEF']
-    columns = list()
-    columns = (
+    columns = [
             'TEAM',
             #'Starter',
             'Total_P YDS/G',
             'Total_R YDS/G',
             'Receiving_YDS/G',
             'Injury Indicator',
-            'Location')
+            'Location']
     for column in columns:
         df = df.drop(column, axis = 1)
 
@@ -539,8 +630,7 @@ for side in sides:
         weekdf = weekdf[weekdf['Position'] <> 'DEF']
     elif side == 'defense':
         weekdf[weekdf['Position'] == 'DEF']
-    columns = list()
-    columns = (
+    columns = [
             'Id',
             'TEAM',
             #'Starter',
@@ -582,7 +672,7 @@ for side in sides:
             'Returning_LNG',
             'Returning_TD',
             'Returning_ATT',
-            'Returning_FC')
+            'Returning_FC']
     for column in columns:
         weekdf = weekdf.drop(column, axis = 1)
 
@@ -593,10 +683,11 @@ for side in sides:
     for position in positions:
         output_data[position] = weekdf[weekdf['Position'] == position]
         iteration = 0
+            
         while iteration < iterations:
             
             # Player count dictionary
-            playerCount = dict((position, 0) for position in positions)
+            playerCount = dict()
             
             # Training and test set dictionaries
             train = dict((position, None) for position in positions)
@@ -635,8 +726,8 @@ for side in sides:
             for player in set(df1[position]['Name']):
                 playerCount[player] = df1[position]['Name'][df1[position]['Name'] == player].count()
         
-                # Only include players that show up more than once
-                if playerCount[player] > 1:
+                # Only include players that show up more than once and have the potential to play based on depth chart
+                if (playerCount[player] > 1):
                     df2[player] = df1[position][df1[position]['Name'] == player]
                     try:
                         train[position] = train[position].append(TrainingSet(math.floor(playerCount[player]*0.7), df2[player]))
@@ -669,10 +760,9 @@ for side in sides:
             test_target[position] = test_target[position].values.T.tolist()
         
             # Use only columns determined to be relevant predictors for each position.  Drop all columns in list below.
-            columns = list()
             if position == 'QB':
                 # Include passing and rushing metrics
-                columns = (
+                columns = [
                         'Position',
                         'Oppt',
                         'FD points',
@@ -680,10 +770,10 @@ for side in sides:
                         'Receiving_REC',
                         'Receiving_TD',
                         'Receiving_FUML',
-                        'Passing_SACK')
+                        'Passing_SACK']
             elif position == 'RB':
                 # Include rushing and receiving metrics
-                columns = (
+                columns = [
                         'Position',
                         'Oppt',
                         'FD points',
@@ -692,10 +782,10 @@ for side in sides:
                         'Passing_TD',
                         'Passing_INT',
                         'Passing_RATE',
-                        'Passing_SACK')
+                        'Passing_SACK']
             elif (position == 'WR') or (position == 'TE'):
                 # Include only receiving metrics
-                columns = (
+                columns = [
                         'Position',
                         'Oppt',
                         'FD points',
@@ -709,10 +799,10 @@ for side in sides:
                         'Rushing_TD',
                         'Rushing_YDS/G',
                         'Rushing_FUML',
-                        'Passing_SACK')
+                        'Passing_SACK']
             elif position == 'K':
                 # Return only kicking metrics
-                columns = (
+                columns = [
                         'Position',
                         'Oppt',
                         'FD points',
@@ -731,10 +821,10 @@ for side in sides:
                         'Receiving_REC',
                         'Receiving_TD',
                         'Receiving_FUML',
-                        'Passing_SACK')
+                        'Passing_SACK']
             elif position == 'DEF':
                 # Include relevant metrics from opposing offense
-                columns = (
+                columns = [
                         'Position',
                         'Oppt',
                         'FD points',
@@ -749,7 +839,7 @@ for side in sides:
                         'Receiving_REC',
                         'Receiving_RK',
                         'Rushing_RK',
-                        'Passing_RK')
+                        'Passing_RK']
         
             # Drop columns
             for column in columns:
@@ -889,8 +979,7 @@ for side in sides:
         output_data[position] = pd.concat([output_data[position], mean[position], median[position], stdev[position]], axis = 1)
 
         # Remove unnecessary columns from output data
-        columns = list()
-        columns = (
+        columns = [
                 'Passing_INT',
                 'Passing_PCT',
                 'Passing_RATE',
@@ -911,11 +1000,34 @@ for side in sides:
                 'h/a',
                 'roof_type',
                 'surface_type',
-                'location')
+                'location']
                 
         for column in columns:
             if column in output_data[position]:
                 output_data[position] = output_data[position].drop(column, axis = 1)
+
+        # Determine which depth charts to use based on position
+        if position == 'RB':
+            positiondf = depth[(depth['Position'] == position) | (depth['Position'] == 'FB')]
+        elif position == 'DEF':
+            pass
+        else:
+            positiondf = depth[depth['Position'] == position]
+        
+        # Create list of players to keep in output
+        if position in ['QB', 'K']:
+            playerlist = str(positiondf['Starter'])
+        elif position == 'WR':
+            playerlist = str(positiondf['WR1'].append([positiondf['WR2'], positiondf['WR3'], positiondf['Reserves']]))
+        elif position == 'TE':
+            playerlist = str(positiondf['Starter'].append(positiondf['Reserves']))
+        elif position == 'RB':
+            playerlist = str(positiondf['Starter'].append(positiondf['Backup']))
+
+        # Remove players that shouldn't be there because they are too deep on the depth chart
+        for player in output_data[position]['Name']:
+            if player not in playerlist:
+                output_data[position] = output_data[position][output_data[position]['Name'] <> player]
             
     # Create dataset with positions all in one dataset
     for i, position in enumerate(output_data):
