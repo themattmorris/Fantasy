@@ -1016,17 +1016,17 @@ for side in sides:
         
         # Create list of players to keep in output
         if position in ['QB', 'K']:
-            playerlist = str(positiondf['Starter'])
+            playerlist = list(positiondf['Starter'])
         elif position == 'WR':
-            playerlist = str(positiondf['WR1'].append([positiondf['WR2'], positiondf['WR3'], positiondf['Reserves']]))
+            playerlist = list(positiondf['WR1'].append([positiondf['WR2'], positiondf['WR3'], positiondf['Reserves']]))
         elif position == 'TE':
-            playerlist = str(positiondf['Starter'].append(positiondf['Reserves']))
+            playerlist = list(positiondf['Starter'].append(positiondf['Reserves']))
         elif position == 'RB':
-            playerlist = str(positiondf['Starter'].append(positiondf['Backup']))
+            playerlist = list(positiondf['Starter'].append(positiondf['Backup']))
 
         # Remove players that shouldn't be there because they are too deep on the depth chart
         for player in output_data[position]['Name']:
-            if player not in playerlist:
+            if (player not in playerlist) and (position <> 'DEF'):
                 output_data[position] = output_data[position][output_data[position]['Name'] <> player]
             
     # Create dataset with positions all in one dataset
