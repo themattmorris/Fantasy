@@ -14,7 +14,6 @@ filepath = 'C:/Users/Matt/Desktop/' # location of where to write output file
 import numpy as np
 import pandas as pd
 import math
-import matplotlib as plt
 from requests import get
 from re import compile
 from io import StringIO, BytesIO
@@ -28,19 +27,9 @@ from datetime import datetime
 ###                  INITIALIZE VARIABLES                     ### 
 ### ========================================================= ###
 
-salCap = 60000 # dollars
 colName = 'Projection' # column name for Fan Duel projections
 filename ='week_' + str(curWeek) + '_projections.csv' # name of file to write output to
 iterations = 10 # number of model iterations to run
-
-# Number of players by position in lineup
-pos_count = {
-'QB':1,
-'RB':2,
-'WR':3,
-'TE':1,
-'K':1,
-'DEF':1}
 
 # Both sides of the ball
 sides = ['offense', 'defense']
@@ -1099,36 +1088,3 @@ for side in sides:
     
 # Write projections to csv file at end
 output.to_csv(filepath + filename, index = False, sep=',', header = True)
-
-### ========================================================= ###
-###                     OPTIMIZE LINEUP                       ### 
-### ========================================================= ###
-
-# Initially was going to try to optimize in this script, but this is done in another script.
-# The lineup variable below spits out the best lineup, but does not take salary cap into account.
-
-# Position data dictionary
-positions = list()
-positions = set(output['Position'])
-
-# Sort lineup dataframe by highest fantasy points
-output = output.sort(['Mean'], ascending = False)
-output = output.reset_index()
-
-# Lineup dictionary
-lineup = defaultdict(dict)
-
-# Create lineup with best players by projections regardless of salary cap
-for position in positions:
-    plist = list()
-    ptlist = list()
-    slist = list()
-    while len(plist) < pos_count[position]:
-        for index, row in output.iterrows():
-            if (row['Position'] == position) and (row['Name'] not in plist):
-                plist.append(row['Name'])
-                ptlist.append(row['Mean'])
-                slist.append(row['Salary'])
-                break
-    for i, player in enumerate(plist):
-        lineup[position][player] = {colName: ptlist[i], 'Salary': slist[i]}
