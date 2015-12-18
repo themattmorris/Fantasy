@@ -9,28 +9,25 @@ lapply(data.packages, library, character.only = T)
 output.path = "/Users/brett/GitHub/proj-fantasy/5.final_optimized_lineup/optimal_lineup.csv"
 
 #### import output from player_projections_&_fanduel_merge.py ####
-players <- tbl_df(read.csv("https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/player_pool.csv", header = TRUE, ",", skipNul = FALSE, stringsAsFactors = FALSE))
+Players <- tbl_df(read.csv("https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/week_15_projections.csv", header = TRUE, ",", skipNul = FALSE, stringsAsFactors = FALSE))
 
-#### manually remove backup qb's 
-players <- players %>%
-  filter(name != "Geno Smith")
-num.x <- length(players$position)
+num.x <- length(Players$Position)
 
 #### set objective: ####
-obj <- players$projection
+obj <- Players$Mean
 
 #### vars are represented as booleans ####
 var.types <- rep("B", num.x)
 
 #### constraints ####
-matrix <- rbind(as.numeric(players$position == "QB"),
-                as.numeric(players$position == "RB"),
-                as.numeric(players$position == "WR"),
-                as.numeric(players$position == "TE"),
-                as.numeric(players$position == "K"),
-                as.numeric(players$position == "D"),
-                as.numeric(players$position %in% c("QB", "RB", "WR", "TE", "K", "D")),
-                players$salary)
+matrix <- rbind(as.numeric(Players$Position == "QB"),
+                as.numeric(Players$Position == "RB"),
+                as.numeric(Players$Position == "WR"),
+                as.numeric(Players$Position == "TE"),
+                as.numeric(Players$Position == "K"),
+                as.numeric(Players$Position == "DEF"),
+                as.numeric(Players$Position %in% c("QB", "RB", "WR", "TE", "K", "DEF")),
+                Players$Salary)
 
 direction <- c("==",
                "==",
@@ -56,8 +53,6 @@ sol <- Rglpk_solve_LP(obj = obj, mat = matrix, dir = direction, rhs = rhs,
 
 sol
 
-players[sol$solution==1,]
+Optimal <- Players[sol$solution==1,]
 #### return and write optimal lineup for game ####
-optimal <- tbl_df(players[sol$solution==1,])
-
-write.csv(optimal, output.path)
+write.csv(Optimal[,4:8], output.path)
