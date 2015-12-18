@@ -922,7 +922,7 @@ for side in sides:
             lm_pred_test[position] = lm[position].predict(test[position])
         
             ### GRADIENT BOOSTING MACHINE ###
-            params = {'n_estimators': 250, 'max_depth': 3, 'min_samples_split': 1, 'learning_rate': 0.005, 'loss': 'ls'}
+            params = {'n_estimators': 250, 'max_depth': 3, 'min_samples_split': 1, 'learning_rate': 0.01, 'loss': 'ls'}
             gbm[position] = ensemble.GradientBoostingRegressor(**params)
             gbm[position].fit(train[position], train_target[position])
             gbm_pred_train[position] = gbm[position].predict(train[position])
