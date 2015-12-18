@@ -30,7 +30,7 @@ from datetime import datetime
 
 salCap = 60000 # dollars
 colName = 'Projection' # column name for Fan Duel projections
-filename ='Week' + str(curWeek) + '_projections.csv' # name of file to write output to
+filename ='week_' + str(curWeek) + '_projections.csv' # name of file to write output to
 iterations = 10 # number of model iterations to run
 
 # Number of players by position in lineup
