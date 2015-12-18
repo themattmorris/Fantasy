@@ -22,8 +22,8 @@ R is used to do the linear optimization problem to find the optimal lineup given
 
 ####Documentation
 #####Github Project Location: [Project Fantasy](https://github.com/brttstl/proj-fantasy)
-######Part 1: Web Scraping
-######Script Location: [Projections.py](https://github.com/brttstl/proj-fantasy/blob/master/3.projections/projections.py)
+#####Part 1: Web Scraping
+Script Location: [Projections.py](https://github.com/brttstl/proj-fantasy/blob/master/3.projections/projections.py)
 This script scrapes several web pages for data input into the regression model.  Below are the sources it pulls from:
 - [ESPN](espn.go.com/nfl/statistics/team/_/stat/)
    Historical (from current season) team aggregate data. Used for opponent team statistics.
@@ -37,7 +37,7 @@ This script scrapes several web pages for data input into the regression model. 
 - [RotoGuru](http://rotoguru1.com/cgi-bin/fyday.pl)
    FanDuel.com historical player performance and salary.  Player performance used as target variable in projection models.
 
-######Part 2: Projections Model
+#####Part 2: Projections Model
 Script Location: [Projections.py](https://github.com/brttstl/proj-fantasy/blob/master/3.projections/projections.py)
 - External data inputs:
   - [NFL stadium attributes](https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/stadiums.csv)
