@@ -4,7 +4,7 @@
 - December 18, 2015
 
 ####Software
-This project used both R ([version 3.2.2]()) and Python (version 2.7.9) for the analysis.  Below is a list of packages from each that are required to be installed in order to run the analysis:
+This project used both R (version 3.2.2) and Python (version 2.7.9) for the analysis.  Below is a list of packages from each that are required to be installed in order to run the analysis:
 - Python:
   - BeautifulSoup
   - datetime
