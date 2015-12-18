@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ##Project: Fantasy Football Team Optimizer
 - Brett Steele, Matt Morris, & Roderick Head
 - INFO 590-34717
