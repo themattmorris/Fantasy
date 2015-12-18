@@ -19,7 +19,6 @@ from re import compile
 from io import StringIO, BytesIO
 from sklearn import metrics, linear_model, ensemble
 from sklearn.feature_extraction import DictVectorizer
-from collections import defaultdict
 from BeautifulSoup import BeautifulSoup
 from datetime import datetime
 
