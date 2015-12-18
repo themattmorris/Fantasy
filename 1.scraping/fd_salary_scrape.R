@@ -15,7 +15,7 @@ lapply(packages, library, character.only = T)
 #### IMPORTANT: specify final output path here ####
 output.path = "/Users/brett/GitHub/proj-fantasy/data/salary.csv"
 
-#### create list of season 2015 results through week 13 ####
+#### create list of season 2015 results through week 14 ####
 fd.sites <- c("http://rotoguru1.com/cgi-bin/fyday.pl?week=14&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=13&game=fd&scsv=1",
             "http://rotoguru1.com/cgi-bin/fyday.pl?week=12&game=fd&scsv=1",
