@@ -17,11 +17,12 @@ import math
 import matplotlib as plt
 from requests import get
 from re import compile
-from io import StringIO
+from io import StringIO, BytesIO
 from sklearn import metrics, linear_model, ensemble
 from sklearn.feature_extraction import DictVectorizer
 from collections import defaultdict
 from BeautifulSoup import BeautifulSoup
+from datetime import datetime
 
 ### ========================================================= ###
 ###                  INITIALIZE VARIABLES                     ### 
@@ -343,6 +344,58 @@ def DepthChart():
         
     return depth
 
+def FDSalary():
+
+    # Gets historical fan duel salaries and performance
+    for i in range(1, 17):
+        url = 'http://rotoguru1.com/cgi-bin/fyday.pl?week=' + str(i) + '&game=fd&scsv=1'
+        response = get(url)
+        data = response.text
+        soup = BeautifulSoup(data)
+        
+        # Pull HTML table into Python
+        soup = str(soup)
+        table = soup[soup.find("Week;Year;"):soup.find("</pre>") - 2]
+        table = BytesIO(table)
+
+        # Keep appending subsequent weeks into dataframe
+        if i ==1:
+            df = pd.read_csv(table, sep = ';')        
+        elif soup.find(str(i) + ';' + str(datetime.now().year)) > -1:
+            df = df.append(pd.read_csv(table, sep = ';'), ignore_index = True)
+
+    # Initialize location columns
+    df['Location'] = np.nan
+
+    # Clean data
+    row = 0
+    while row < len(df):
+        # Uppercase team abbreviations
+        df.loc[row, 'Team'] = df.loc[row, 'Team'].upper()
+        df.loc[row, 'Oppt'] = df.loc[row, 'Oppt'].upper()
+        # Standardize team abbreviations
+        if df.loc[row, 'Team'] in teamabr:
+            df.loc[row, 'Team'] = teamabr[df.loc[row, 'Team']]
+        if df.loc[row, 'Oppt'] in teamabr:
+            df.loc[row, 'Oppt'] = teamabr[df.loc[row, 'Oppt']]
+        # Standardize how defense names are reported
+        if df.loc[row, 'Pos'] == 'Def':
+            df.loc[row, 'Pos'] = 'DEF'
+            df.loc[row, 'Name'] = df.loc[row, 'Team'] + ' Defense'
+        else:
+            # Fix name formatting to use as join later
+            name = df.loc[row, 'Name']
+            df.loc[row, 'Name'] = name[name.find(',') + 2:len(name)] + ' ' + name[0:name.find(',')]
+        # Append location column
+        if df.loc[row, 'h/a'] == 'h':
+            df.loc[row, 'Location'] = df.loc[row, 'Team']
+        else:
+            df.loc[row, 'Location'] = df.loc[row, 'Oppt']
+        
+        row += 1
+
+    return df
+
 def CleanWeekDF():
 
     global teamabr
@@ -387,9 +440,9 @@ def CleanWeekDF():
 
         # Determine if the current player is at home or away
         if weekdf.loc[count, 'Location'] == weekdf.loc[count, 'Team']:
-            weekdf.loc[count, 'h/a'] = 'H'
+            weekdf.loc[count, 'h/a'] = 'h'
         else:
-            weekdf.loc[count, 'h/a'] = 'A'
+            weekdf.loc[count, 'h/a'] = 'a'
             
         # Reformat name attributes (to be joined to later)
         if weekdf['Position'][count] == 'D':
@@ -438,15 +491,41 @@ for side in sides:
         url = 'http://espn.go.com/nfl/statistics/team/_/stat/total/position/defense'
     WebScrape(url, side)
 
+
 # Get current week depth charts
 depth = DepthChart()
+
+
+# Get historical fan duel salaries and points
+seasondf = FDSalary()
+# Drop unnecessary columns
+columns = [
+        'GID',
+        'Year',
+        'Week',
+        'Pos']
+for column in columns:
+    seasondf = seasondf.drop(column, axis = 1)
+
+
+# Read in current stadium data csv and merge it to the other datasets
+stadiums = get('https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/stadiums.csv').content
+stadiums = pd.read_csv(StringIO(stadiums.decode('utf-8'))) 
+# Drop unnecessary columns
+columns = [
+        'season',
+        'stadium_name',
+        'city',
+        'state',
+        'team',
+        'capacity',
+        'surface_description']
+for column in columns:
+    stadiums = stadiums.drop(column, axis = 1)
 
 ### ========================================================= ###
 ###                     PREPARE DATA                          ### 
 ### ========================================================= ###
-
-# Go through both offense and defense
-outdf = dict((side, None) for side in sides)
 
 for side in sides:
 
@@ -521,10 +600,9 @@ for side in sides:
         
     for column in columns:
         df = df.drop(column, axis = 1)
-    
+
     # Read in current week players with predictor variables included to run through models
     weekdf = CleanWeekDF()
-
     # Drop unnecessary columns
     columns = [
             'Played',
@@ -541,36 +619,7 @@ for side in sides:
         try:
             weekdf = weekdf.drop(column, axis = 1)
         except:
-            Exception
-
-    # Read in fan duel season data into model
-    seasondf = get('https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/fanduel_season_data.csv').content
-    seasondf = pd.read_csv(StringIO(seasondf.decode('utf-8')))
-
-    # Drop unnecessary columns
-    columns = [
-            'GID',
-            'Year',
-            'Week',
-            'Pos']
-    for column in columns:
-        seasondf = seasondf.drop(column, axis = 1)
-    
-    # Read in current stadium data csv and merge it to the other datasets
-    stadiums = get('https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/stadiums.csv').content
-    stadiums = pd.read_csv(StringIO(stadiums.decode('utf-8')))
-    
-    # Drop unnecessary columns
-    columns = [
-            'season',
-            'stadium_name',
-            'city',
-            'state',
-            'team',
-            'capacity',
-            'surface_description']
-    for column in columns:
-        stadiums = stadiums.drop(column, axis = 1)
+                Exception
 
     # Merge datasets to create one dataset
     df = pd.merge(left = df, right = seasondf, left_on = 'TEAM', right_on = 'Oppt')
@@ -579,14 +628,12 @@ for side in sides:
     
     # Remove players that aren't playing and remove unnecessary columns
     df = df[(df['Injury Indicator'] != 'O') & (df['Injury Indicator'] != 'IR')]
-    # df = df[df['Starter'] == 'Y']
     if side == 'offense':
         df = df[df['Position'] <> 'DEF']
     elif side == 'defense':
         df = df[df['Position'] == 'DEF']
     columns = [
             'TEAM',
-            #'Starter',
             'Total_P YDS/G',
             'Total_R YDS/G',
             'Receiving_YDS/G',
@@ -626,7 +673,6 @@ for side in sides:
     
     # Remove players that aren't playing and remove unnecessary columns
     weekdf = weekdf[(weekdf['Injury Indicator'] != 'O') & (weekdf['Injury Indicator'] != 'IR')]
-    #weekdf = weekdf[weekdf['Starter'] == 'Y']
     if side == 'offense':
         weekdf = weekdf[weekdf['Position'] <> 'DEF']
     elif side == 'defense':
@@ -634,7 +680,6 @@ for side in sides:
     columns = [
             'Id',
             'TEAM',
-            #'Starter',
             'Total_P YDS/G',
             'Total_YDS/G',
             'Total_R YDS/G',
