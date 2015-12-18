@@ -38,11 +38,12 @@ Current week depth charts.  Used to determine where a player fits on the team’
 FanDuel.com historical player performance and salary.  Player performance used as target variable in projection models.
 
 ######Part 2: Projections Model
-######Script Location: [Projections.py](https://github.com/brttstl/proj-fantasy/blob/master/3.projections/projections.py)
-External data inputs:
-- [NFL stadium attributes](https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/stadiums.csv)
-- [Eligible FanDuel Player List](https://github.com/brttstl/proj-fantasy/blob/master/data/FanDuel-NFL-2015-12-20-13996-players-list.csv)
-List of the next week’s available players (week to project for).  In this case, it is week 15 of the 2015 NFL season.
+Script Location: [Projections.py](https://github.com/brttstl/proj-fantasy/blob/master/3.projections/projections.py)
+- External data inputs:
+  - [NFL stadium attributes](https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/stadiums.csv)
+  - [Eligible FanDuel Player List](https://github.com/brttstl/proj-fantasy/blob/master/data/FanDuel-NFL-2015-12-20-13996-players-list.csv)
+    List of the next week’s available players (week to project for).  In this case, it is week 15 of the 2015 NFL season.
+
 - Output: Next week’s projections in a csv format to folder set by user in one of the first lines of code within the script.
 
 How it works:
