@@ -26,16 +26,16 @@ R is used to do the linear optimization problem to find the optimal lineup given
 ######Script Location: [Projections.py](https://github.com/brttstl/proj-fantasy/blob/master/3.projections/projections.py)
 This script scrapes several web pages for data input into the regression model.  Below are the sources it pulls from:
 - [ESPN](espn.go.com/nfl/statistics/team/_/stat/)
-  Historical (from current season) team aggregate data. Used for opponent team statistics.
+   Historical (from current season) team aggregate data. Used for opponent team statistics.
 - [Fox Sports Depth Charts](http://www.foxsports.com/fantasy/football/commissioner/Players/DepthCharts.aspx)
-  Current week depth charts.  Used to determine where a player fits on the team’s roster.  Below shows which players are considered in this model:
+   Current week depth charts.  Used to determine where a player fits on the team’s roster.  Below shows which players are considered in this model:
   - Quarterbacks: only starters
   - Running backs: starters and backups
   - Wide Receivers: WR1, WR2, WR3, and reserves
   - Tight Ends: starters and reserves
   - Kickers: only starters
 - [RotoGuru](http://rotoguru1.com/cgi-bin/fyday.pl)
-  FanDuel.com historical player performance and salary.  Player performance used as target variable in projection models.
+   FanDuel.com historical player performance and salary.  Player performance used as target variable in projection models.
 
 ######Part 2: Projections Model
 Script Location: [Projections.py](https://github.com/brttstl/proj-fantasy/blob/master/3.projections/projections.py)
