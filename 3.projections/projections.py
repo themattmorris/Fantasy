@@ -14,10 +14,11 @@ filepath = 'C:/Users/Matt/Desktop/' # location of where to write output file
 import numpy as np
 import pandas as pd
 import math
+import matplotlib as plt
 from requests import get
 from re import compile
 from io import StringIO
-from sklearn import metrics, linear_model, svm, ensemble
+from sklearn import metrics, linear_model, ensemble
 from sklearn.feature_extraction import DictVectorizer
 from collections import defaultdict
 from BeautifulSoup import BeautifulSoup
@@ -707,6 +708,8 @@ for side in sides:
             model_data2 = dict((position, []) for position in positions)
             model_pred = dict((position, None) for position in positions)
             model_features = dict((position, None) for position in positions)
+
+            # Gradient boosted machine dictionaries
             gbm = dict((position, None) for position in positions)
             gbm_pred_train = dict((position, None) for position in positions)
             gbm_pred_test = dict((position, None) for position in positions)
@@ -717,7 +720,20 @@ for side in sides:
             gbm_medae_train = dict((position, None) for position in positions)
             gbm_medae_test = dict((position, None) for position in positions)
             gbm_r2_train = dict((position, None) for position in positions)
-            gbm_r2_test = dict((position, None) for position in positions)            
+            gbm_r2_test = dict((position, None) for position in positions)
+
+            # Generalized linear model dictionaries
+            lm = dict((position, None) for position in positions)
+            lm_pred_train = dict((position, None) for position in positions)
+            lm_pred_test = dict((position, None) for position in positions)
+            lm_mae_train = dict((position, None) for position in positions)
+            lm_mae_test = dict((position, None) for position in positions)
+            lm_mse_train = dict((position, None) for position in positions)
+            lm_mse_test = dict((position, None) for position in positions)
+            lm_medae_train = dict((position, None) for position in positions)
+            lm_medae_test = dict((position, None) for position in positions)
+            lm_r2_train = dict((position, None) for position in positions)
+            lm_r2_test = dict((position, None) for position in positions)
             
             model_data[position] = weekdf[weekdf['Position'] == position]
             df1[position] = df[df['Position'] == position]
@@ -899,26 +915,18 @@ for side in sides:
         
             # Create a different model for every position in list
         
-            #### GENERALIZED LINEAR MODEL ###
-            #lm = linear_model.LinearRegression()
-            #lm.fit(train, train_target)
-            #pred_train_lm = lm.predict(train)
-            #pred_test_lm = lm.predict(test)
-            #print('MSE on ' + str(position) + ' training set of ' + str(np.mean((pred_train_lm - train_target)**2)))
-            #print('MSE on ' + str(position) + ' test set of ' + str(np.mean((pred_test_lm - test_target)**2)))
+            ### GENERALIZED LINEAR MODEL ###
+            lm[position] = linear_model.LinearRegression()
+            lm[position].fit(train[position], train_target[position])
+            lm_pred_train[position] = lm[position].predict(train[position])
+            lm_pred_test[position] = lm[position].predict(test[position])
         
-            ### GRADIENT BOOSTED MACHINE ###
-            params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 1, 'learning_rate': 0.01, 'loss': 'ls'}
+            ### GRADIENT BOOSTING MACHINE ###
+            params = {'n_estimators': 250, 'max_depth': 3, 'min_samples_split': 1, 'learning_rate': 0.005, 'loss': 'ls'}
             gbm[position] = ensemble.GradientBoostingRegressor(**params)
             gbm[position].fit(train[position], train_target[position])
             gbm_pred_train[position] = gbm[position].predict(train[position])
             gbm_pred_test[position] = gbm[position].predict(test[position])
-        
-            #### SUPPORT VECTOR MACHINE ###
-            #clf = svm.SVC()
-            #clf.fit(train, train_target)
-            #pred_train_svm = clf.predict(train)
-            #pred_test_svm = clf.predict(test)
     
         ### ========================================================= ###
         ###                     EVALUATE MODELS                       ### 
@@ -929,25 +937,33 @@ for side in sides:
             # Mean absolute error
             gbm_mae_train[position] = metrics.mean_absolute_error(train_target[position], gbm_pred_train[position])
             gbm_mae_test[position] = metrics.mean_absolute_error(test_target[position], gbm_pred_test[position])
+            lm_mae_train[position] = metrics.mean_absolute_error(train_target[position], lm_pred_train[position])
+            lm_mae_test[position] = metrics.mean_absolute_error(test_target[position], lm_pred_test[position])             
             
             # Mean squared error
             gbm_mse_train[position] = metrics.mean_squared_error(train_target[position], gbm_pred_train[position])
             gbm_mse_test[position] = metrics.mean_squared_error(test_target[position], gbm_pred_test[position])
+            lm_mse_train[position] = metrics.mean_squared_error(train_target[position], lm_pred_train[position])
+            lm_mse_test[position] = metrics.mean_squared_error(test_target[position], lm_pred_test[position])          
         
             # Median absolute error
             gbm_medae_train[position] = metrics.median_absolute_error(train_target[position], gbm_pred_train[position])
             gbm_medae_test[position] = metrics.median_absolute_error(test_target[position], gbm_pred_test[position])
+            lm_medae_train[position] = metrics.median_absolute_error(train_target[position], lm_pred_train[position])
+            lm_medae_test[position] = metrics.median_absolute_error(test_target[position], lm_pred_test[position])            
         
             # R-squared
             gbm_r2_train[position] = metrics.r2_score(train_target[position], gbm_pred_train[position])
             gbm_r2_test[position] = metrics.r2_score(test_target[position], gbm_pred_test[position])
+            lm_r2_train[position] = metrics.r2_score(train_target[position], lm_pred_train[position])
+            lm_r2_test[position] = metrics.r2_score(test_target[position], lm_pred_test[position])    
     
     ### ========================================================= ###
     ###                         RUN MODEL                         ### 
     ### ========================================================= ###
 
             ### GRADIENT BOOSTED MACHINE ###
-            params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 1, 'learning_rate': 0.01, 'loss': 'ls'}
+            params = {'n_estimators': 250, 'max_depth': 3, 'min_samples_split': 1, 'learning_rate': 0.01, 'loss': 'ls'}
             gbm[position] = ensemble.GradientBoostingRegressor(**params)
             gbm[position].fit(all_data[position], all_data_target[position])
         
