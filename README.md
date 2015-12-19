@@ -33,14 +33,14 @@ Below are instructions on how to run all stages of the program from start to fin
     3. Enter this contest
     4. Click “Download players list” link near the top middle of page.
   3. Upload the players list downloaded in step 2 to Github.
-  4. Open python file [projections.py](https://github.com/brttstl/proj-fantasy/blob/master/3.projections/projections.py).  Go to lines 5-8 of the code and update these user inputs:
+  4. Open python file [projections.py](https://github.com/brttstl/proj-fantasy/blob/master/1.projections/projections.py).  Go to lines 5-8 of the code and update these user inputs:
     * Line 5: NFL week to create projection for (week 15 in example)
     * Line 6: NFL season (2015 in example)
     * Line 7: Input file: This is the Github location of the file uploaded in step 3.
     * Line 8: Filepath: directory location of where output csv should be saved to.
     * Run script.
   5. Save output file from step 4 to Github.
-  6. Open R file [optimal_lineup.r](https://github.com/brttstl/proj-fantasy/blob/master/4.lineup_optimization/optimal_lineup.r).  User inputs are required on 2 lines of the code:
+  6. Open R file [optimal_lineup.r](https://github.com/brttstl/proj-fantasy/blob/master/2.lineup_optimization/optimal_lineup.r).  User inputs are required on 2 lines of the code:
     * Line 9: Output path: Designate directory of output csv file.
     * Line 12: Change location of file being read to be the location of the file saved in step 5.
     * Run script.
