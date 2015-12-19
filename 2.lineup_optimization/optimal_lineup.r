@@ -53,6 +53,6 @@ sol <- Rglpk_solve_LP(obj = obj, mat = matrix, dir = direction, rhs = rhs,
 
 sol
 
-Optimal <- Players[sol$solution==1,]
+optimal <- Players[sol$solution==1,]
 #### return and write optimal lineup for game ####
-write.csv(Optimal[,4:8], output.path, row.names = FALSE)
+write.csv(optimal[,4:8], output.path, row.names = FALSE)
