@@ -55,4 +55,4 @@ sol
 
 Optimal <- Players[sol$solution==1,]
 #### return and write optimal lineup for game ####
-write.csv(Optimal[,4:8], output.path)
+write.csv(Optimal[,4:8], output.path, row.names = FALSE)

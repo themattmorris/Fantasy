@@ -5,7 +5,7 @@
 curWeek = 15 # week to create projections for
 year = 2015 # football season
 inputfile = 'https://raw.githubusercontent.com/brttstl/proj-fantasy/master/data/FanDuel-NFL-2015-12-20-13996-players-list.csv' # to be read in and create projections from
-filepath = '/Users/brett/GitHub/proj-fantasy/data/' # location of where to write output file
+filepath = '/Users/bsteele/GitHub/proj-fantasy/data/' # location of where to write output file
 
 ### ========================================================= ###
 ###                      IMPORT PACKAGES                      ### 
