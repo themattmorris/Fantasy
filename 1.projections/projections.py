@@ -804,8 +804,6 @@ for side in sides:
                                 train_target[position] = train_target[position].append(df2[player].loc[[index]]['FD points'])
                             except:
                                 train_target[position] = df2[player].loc[[index]]['FD points']
-                else:
-                    all_data[position] = all_data[position][all_data[position]['Name'] <> player]
         
             # Convert data frame vectors to lists to pass into models
             train_target[position] = train_target[position].values.T.tolist()
