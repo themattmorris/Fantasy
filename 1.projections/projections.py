@@ -391,8 +391,11 @@ def CleanWeekDF():
     # Cleans the fan duel current weekly player list (lineup prior to gametime)
     
     # Read in current week players with predictor variables included to run through models
-    weekdf = get(inputfile).content
-    weekdf = pd.read_csv(StringIO(weekdf.decode('utf-8')))
+    try:
+        weekdf = get(inputfile).content
+        weekdf = pd.read_csv(StringIO(weekdf.decode('utf-8')))
+    except:
+        weekdf = pd.read_csv(inputfile)
 
     # Get correct team name for looking up
     for i, team in enumerate(weekdf['Team']):
