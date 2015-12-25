@@ -21,7 +21,7 @@ View(Players)
 num.x <- length(Players$Position)
 
 #### set objective: ####
-obj <- Players$Median
+obj <- Players$Mean
 
 #### vars are represented as booleans ####
 var.types <- rep("B", num.x)
@@ -63,4 +63,4 @@ sol
 optimal <- Players[sol$solution==1,]
 optimal
 #### return and write optimal lineup for game ####
-write.csv(optimal[,4:8], output.path.mdmax, row.names = FALSE)
+write.csv(optimal[,4:8], output.path.mnmax, row.names = FALSE)
