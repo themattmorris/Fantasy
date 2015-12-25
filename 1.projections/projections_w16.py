@@ -28,7 +28,7 @@ from datetime import datetime
 
 colName = 'Projection' # column name for Fan Duel projections
 filename ='week_' + str(curWeek) + '_projections.csv' # name of file to write output to
-iterations = 10 # number of model iterations to run
+iterations = 50 # number of model iterations to run
 
 # Both sides of the ball
 sides = ['offense', 'defense']
